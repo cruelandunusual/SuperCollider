@@ -7,3 +7,6 @@ y.free;
 
 x = {SinOsc.ar};
 x.play;
+
+
+{SinOsc.ar(440*2, 300, 1.0, 0.2)}.play;
