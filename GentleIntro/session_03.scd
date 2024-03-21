@@ -44,3 +44,19 @@ Pbind(\note, 9).play;
 Pbind(\midinote, 69).play;
 
 Pbind(\freq, 440).play;
+
+/*
+ * Thu 22-03-2024
+ * (Re)Learning about patterns
+ *
+ */
+
+(
+var time=0.2;
+Pbind(
+	\note, Pseq([[0, 3, 7], Rest(time), [2, 5, 8], [3, 7, 10], [5, 8, 12], Rest(time)], 3),
+	\dur, 0.22,
+	\legato, 0.3,
+	\strum, 0.1 // try 0, 0.1, 0.2, etc
+).play;
+)
