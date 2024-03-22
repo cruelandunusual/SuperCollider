@@ -60,3 +60,48 @@ Pbind(
 	\strum, 0.1 // try 0, 0.1, 0.2, etc
 ).play;
 )
+
+/*
+ * Fri 23-03-2024
+ * (Re)Learning about patterns
+ *
+ */
+(
+Pbind(
+	/*
+	when you don't explicitly
+	specify a scale, Scale.major
+	is assumed
+	*/
+	//\scale, Scale.melodicMinor,
+	//\scale, Scale.major,
+	//\scale, Scale.iwato,
+	\degree, Pseq([0, 1, 2, 3, 4, 5, 6, 7], 1),
+	\dur, 0.15;
+).play
+)
+
+
+Scale.directory; //evaluate this for a list of all available scales
+
+(
+Pbind(
+	/*
+	3.1 after 3 means one
+	chromatic step above 3,
+	in this case F# above F
+	*/
+	\degree, Pseq([0, 1, 2, 3, 3.1, 4], 1),
+).play;
+)
+
+
+(
+Pbind(
+	//scale, Scale.major,
+	//\degree, Pseq([0, 1, 2, 3, 4, 5, 6, 7], 1),
+	\note, Pser([0, 2, 3, 5, 7, 8, 11, 12], 8),
+	\ctranspose, 0, //transpose an octave above (= 12 semitones)
+	\dur, 0.15;
+).play;
+)
