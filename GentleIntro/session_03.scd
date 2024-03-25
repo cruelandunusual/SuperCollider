@@ -46,7 +46,7 @@ Pbind(\midinote, 69).play;
 Pbind(\freq, 440).play;
 
 /*
- * Thu 22-03-2024
+ * Thu 21-03-2024
  * (Re)Learning about patterns
  *
  */
@@ -62,7 +62,7 @@ Pbind(
 )
 
 /*
- * Fri 23-03-2024
+ * Fri 22-03-2024
  * (Re)Learning about patterns
  *
  */
@@ -104,4 +104,23 @@ Pbind(
 	\ctranspose, 0, //transpose an octave above (= 12 semitones)
 	\dur, 0.15;
 ).play;
+)
+
+/*
+ * Mon 25-03-2024
+ * (Re)Learning about patterns
+ *
+ */
+(
+var tempo = 400/60;
+var time=0.2;
+Pbind(
+	/*
+	3.1 after 3 means one
+	chromatic step above 3,
+	in this case F# above F
+	*/
+	\degree, Pseq([0, 1, 2, Rest(time), 3, 3.1, 4], 1),
+	\dur, 1,
+).play(TempoClock(tempo));
 )
