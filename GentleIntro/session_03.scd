@@ -85,6 +85,7 @@ Pbind(
 Scale.directory; //evaluate this for a list of all available scales
 
 (
+var tempo = 120/60;
 Pbind(
 	/*
 	3.1 after 3 means one
@@ -92,7 +93,8 @@ Pbind(
 	in this case F# above F
 	*/
 	\degree, Pseq([0, 1, 2, 3, 3.1, 4], 1),
-).play;
+	\dur, 0.2;
+).play(TempoClock(tempo));
 )
 
 
@@ -112,15 +114,81 @@ Pbind(
  *
  */
 (
-var tempo = 400/60;
-var time=0.2;
+var tempo = 120/60;
+var time = 0.2;
+var beat = 1;
 Pbind(
 	/*
 	3.1 after 3 means one
 	chromatic step above 3,
 	in this case F# above F
 	*/
-	\degree, Pseq([0, 1, 2, Rest(time), 3, 3.1, 4], 1),
-	\dur, 1,
+	\degree, Pseq([0, 1, 2, Rest(beat), 3, 3.1, 4], 1),
+	\dur, beat,
 ).play(TempoClock(tempo));
+)
+
+/*
+ * Tue 26-03-2024
+ * (Re)Learning about patterns
+ *
+ */
+(
+Pbind(
+	\freq, Pn(Pseries(110, 110, 10)),
+	\dur, 1/2,
+	\legato, Pwhite(0.1, 1);
+).play;
+
+Pbind(
+	\freq, Pn(Pseries(220, 222, 10)),
+	\dur, 1/4,
+	\legato, Pwhite(0.1, 1);
+).play;
+
+Pbind(
+	\freq, Pn(Pseries(330, 333, 10)),
+	\dur, 1/6,
+	\legato, 0.1;
+).play;
+)
+
+(//using {}.fork to evaluate code in a timed manner
+{
+	"one thing".postln;
+	2.wait;
+	"another thing".postln;
+	1.5.wait;
+	"one last thing".postln;
+}.fork;
+)
+
+(//using {}.fork to play a proper tune that actually sounds good
+var t = TempoClock(76/60);
+{
+	Pbind(
+		\note, Pseq([[4, 11], [6, 9]], 32),
+		\dur, 1/6,
+		\amp, Pseq([0.05, 0.03], inf);
+	).play(t);
+
+	2.wait;
+
+	Pbind(
+		\note, Pseq([[-25, -13, -1], [-20, -8, 4], \rest], 3),
+		\dur, Pseq([1, 1, Rest(1)], inf),
+		\amp, 0.1,
+		\legato, Pseq([0.4, 0.7, \rest], inf)
+	).play(t);
+
+	2.75.wait;
+
+	Pbind(
+		\note, Pseq([23, 21, 25, 23, 21, 20, 18, 16, 20, 21, 23, 21], inf),
+		\dur, Pseq([0.25, 0.75, 0.25, 1.75, 0.125, 0.125, 0.80, 0.20, 0.125, 0.125, 1], 1),
+		\amp, 0.1,
+		\legato, 0.5
+	).play(t);
+
+}.fork(t);
 )
