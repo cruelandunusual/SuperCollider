@@ -165,12 +165,13 @@ Pbind(
 
 (//using {}.fork to play a proper tune that actually sounds good
 var t = TempoClock(76/60);
+~t = TempoClock(76/60); //~name is the same as var name
 {
 	Pbind(
 		\note, Pseq([[4, 11], [6, 9]], 32),
 		\dur, 1/6,
 		\amp, Pseq([0.05, 0.03], inf);
-	).play(t);
+	).play(~t);
 
 	2.wait;
 
@@ -192,3 +193,90 @@ var t = TempoClock(76/60);
 
 }.fork(t);
 )
+
+/*
+ * Wed 27-03-2024
+ * (Re)Learning about patterns
+ *
+ */
+(
+~scale = [0, 1, 2, 3, 4, 5, 6, 7];
+~durs = [0.4, 0.2, 0.2, 0.4, 0.8, 0.2, 0.2, 0.2];
+
+Pbind(
+\degree, Pseq(~scale),
+\dur, Pseq(~durs)
+).play;
+
+Pbind(
+\degree, Pseq(~scale.reverse + 7), //reversed and an octave higher
+\dur, Pseq(~durs)
+).play;
+)
+
+//define a score
+(
+~scale = [0, 1, 2, 3, 4, 5, 6, 7];
+p = Pbind(
+	\degree, Pseq(~scale, inf),
+	\dur, 1/2
+); // the whole Pbind stored in p is, in effect, the score
+)
+//now we create a variable, q, and store the EventStreamPlayer in it
+q = p.play;
+q.stop; // that way we can start it and stop it, without having to do [ctrl+.], which kills everything
+q.resume;
+q.stop.reset;
+q.start;
+q.stop;
+
+
+/* ------------- */
+
+// Define the score
+(
+var myDurs = Pseq([Pn(1, 5), 3, Pn(1, 5), 3, Pn(1, 6), 1/2, 1/2, 1, 1, 3, 1, 3], inf) * 0.4;
+
+~upperMelody = Pbind(
+	\midinote, Pseq([69, 74, 76, 77, 79, 81, Pseq([81, 79, 81, 82, 79, 81], 2), 82, 81, 79, 77, 76, 74, 74], inf), //nested Pseq...
+	\dur, myDurs
+);
+
+~lowerMelody = Pbind(
+	\midinote, Pseq([57, 62, 61, 60, 59, 58, 57, 55, 53, 52, 50, 49, 50, 52, 50, 55, 53, 52, 53, 55, 57, 58, 61, 62, 62], inf),
+	\dur, myDurs
+);
+)
+// Play the two together:
+(
+~player1 = ~upperMelody.play;
+~player2 = ~lowerMelody.play;
+)
+// Stop them separately:
+~player1.stop;
+~player2.stop;
+
+// Stop them together
+(
+~player1.stop;
+~player2.stop;
+)
+// Other available messages
+~player1.resume;
+~player1.reset;
+~player1.play;
+~player1.start; // same as .play
+
+/* --------------- */
+
+(
+//~scale = [0, 1, 2, 3, 4, 5, 6, 7];
+~scale = [-1, 4, 7,];
+
+p = Pbind(
+	\degree, Pseq([3, 4, 5, ~scale, 2, 1, 0], inf), // the nested sequence gets played as a chord
+	\dur, 0.5
+);
+)
+~player = p.play;
+~player.stop;
