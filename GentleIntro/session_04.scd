@@ -1,6 +1,6 @@
 /*
  * Thu 28-03-2024
- * (Re)Learning about patterns
+ * Objects, and a bit of looping too
  *
  */
 
