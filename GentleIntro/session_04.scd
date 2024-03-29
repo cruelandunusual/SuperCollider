@@ -27,3 +27,14 @@ f = {3.yield};
 x = ({f.loop});
 x.postln;
 )
+
+/*
+ * Fri 29-03-2024
+ * Objects, receiver notation, functional notation
+ *
+ */
+5.dup(20);
+dup(5, 20);
+
+pi.round();
+round(pi, 0.1);
