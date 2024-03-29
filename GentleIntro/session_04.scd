@@ -38,3 +38,6 @@ dup(5, 20);
 
 pi.round();
 round(pi, 0.1);
+
+dup(round(rand(100.00), 0.01), 4);
+exprand(1, 500);
