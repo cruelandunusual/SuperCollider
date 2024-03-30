@@ -41,3 +41,11 @@ round(pi, 0.1);
 
 dup(round(rand(100.00), 0.01), 4);
 exprand(1, 500);
+
+/*
+ * Sat 30-03-2024
+ * Objects, receiver notation, functional notation
+ *
+ */
+a = exprand(1,500);
+Pbind(\freq, a).play;
