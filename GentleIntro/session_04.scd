@@ -41,3 +41,16 @@ round(pi, 0.1);
 
 dup(round(rand(100.00), 0.01), 4);
 exprand(1, 500);
+
+"Here's a string"
+\greatSymbol
+[1, 2, 3, 4, 5].scramble;
+[1, 2, 3, 4, 5].reverse;
+[1, 2, 3, 4, 5].mirror;
+
+60.midicps.round(0.1);
+
+exprand(1, 1000.0);
+{exprand(1, 1000.0)};
+rand(10);
+if(rand(10) > 5, {"very true".postln}, {"very false".postln});
