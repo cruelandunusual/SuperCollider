@@ -19,3 +19,26 @@ x.free;
 n = s.nextNodeID;
 s.sendMsg("/s_new", "FSinOsc-test", n);
 s.sendMsg("/n_free", n);
+
+/*
+ * Wed 03-04-2024
+ * UGens
+ *
+ */
+//define a synth
+(
+SynthDef.new(
+	"Theremin",
+	{
+		Out.ar(0, SinOsc.ar(
+			freq: MouseX.kr(300, 2500),
+			mul:  MouseY.kr(0, 0.05) / 10
+		)
+		)
+	}
+).send(s);
+)
+//create an object of it
+x = Synth.new("Theremin");
+//free it
+x.free;
