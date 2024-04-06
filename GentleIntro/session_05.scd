@@ -32,7 +32,7 @@ SynthDef.new(
 	{
 		Out.ar(0, SinOsc.ar(
 			freq: MouseX.kr(300, 2500),
-			mul:  MouseY.kr(0, 0.05) / 10
+			mul:  MouseY.kr(0, 0.09)
 		)
 		)
 	}
@@ -40,5 +40,38 @@ SynthDef.new(
 )
 //create an object of it
 x = Synth.new("Theremin");
+
 //free it
 x.free;
+
+
+/*
+ * Sat 06-04-2024
+ * UGens, plotting waveforms, polling results
+ *
+ */
+
+{SinOsc.ar(freq: MouseX.kr(300, 2500), mul: MouseY.kr(0, 0.5))}.scope;
+
+{SinOsc.ar}.play;
+{Saw.ar}.scope;
+{Pulse.ar}.plot;
+{SinOsc.ar(freq:440, mul: 0.3, phase:4).poll}.play;
+{LFPulse.ar(1).poll}.play;
+
+
+(
+SynthDef.new(
+	"Bleeper",
+	{
+		Out.ar(0, SinOsc.ar(
+			freq: LFNoise0.kr(4).range(500, 1500),
+			mul: 0.1
+		)
+		)
+	}
+).send(v);
+)
+
+a = Synth.new("Bleeper");
+a.free;
