@@ -75,3 +75,14 @@ SynthDef.new(
 
 a = Synth.new("Bleeper");
 a.free;
+
+/*
+ * Mon 08-04-2024
+ * scale with mul and add
+ *
+ */
+//this...
+{SinOsc.kr(1).range(100, 200).poll}.play;
+//...is the same as this
+{SinOsc.kr(1, mul: 50, add: 150).poll}.play;
+
