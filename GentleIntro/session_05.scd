@@ -57,7 +57,7 @@ x.free;
 {Saw.ar}.scope;
 {Pulse.ar}.plot;
 {SinOsc.ar(freq:440, mul: 0.3, phase:4).poll}.play;
-{LFPulse.ar(1).poll}.play;
+{LFNoise0.ar(100).poll}.play;
 
 
 (
