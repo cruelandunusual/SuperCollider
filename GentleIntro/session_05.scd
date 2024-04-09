@@ -78,11 +78,33 @@ a.free;
 
 /*
  * Mon 08-04-2024
- * scale with mul and add
- *
+ * scale with range()
+ * and mul and add
  */
 //this...
 {SinOsc.kr(1).range(100, 200).poll}.play;
 //...is the same as this
 {SinOsc.kr(1, mul: 50, add: 150).poll}.play;
 
+/*
+ * Tue 09-04-2024
+ * more scaling with range(),
+ * also the linlin() method,
+ * and mul and add
+ */
+{SinOsc.kr(1).range(100, 200).poll}.play;
+{linlin(SinOsc.kr(0.1), 0, 127).poll}.play;
+
+{LFPulse.kr(1).poll}.play;
+
+{LFPulse.kr(1).linlin(0, 1, 100, 300).poll}.play;
+
+(
+{SinOsc.ar(
+	freq: LFPulse.kr(1).range(440,880),
+	phase: 0.0,
+	mul: LFPulse.kr(0.5).range(0.1, 0.3),
+	add: 0.0
+)
+}.play;
+)
