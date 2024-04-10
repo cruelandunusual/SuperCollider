@@ -3,10 +3,12 @@
  * UGens
  *
  */
-f = {FSinOsc.ar(800, 0.0, 0.02)};
-f.play;
-g = f;
-g.stop; //this doesn't work - I can't remember the syntax for freeing a synth object
+f = {
+	arg freq = 800,
+	amp = 0.2;
+	FSinOsc.ar(freq, 0.0, amp);
+}.play;
+f.free;
 
 //define a synth
 SynthDef.new("FSinOsc-test", { Out.ar(0, FSinOsc.ar(800, 0, 0.02)) }).send(s);
@@ -108,3 +110,60 @@ a.free;
 )
 }.play;
 )
+
+/*
+ * Wed 10-04-2024
+ * stopping individual synths,
+ * using the set message to
+ * change parameters
+ * while a synth is playing
+ */
+//create and assign three synths to separate variables
+a = { Saw.ar(LFNoise2.kr(8).range(1000, 2000), mul: 0.2) }.play;
+b = { Saw.ar(LFNoise2.kr(7).range(100, 1000), mul: 0.2) }.play;
+c = { Saw.ar(LFNoise0.kr(15).range(2000, 3000), mul: 0.1) }.play;
+//stop them individually
+a.free;
+b.free;
+c.free;
+
+//The set message
+(
+x = {
+	arg freq = 440,
+	amp = 0.1;
+	SinOsc.ar(
+		freq,
+		0,
+		amp)
+}.play;
+)
+x.set(\freq, 778);
+x.set(\amp, 0.5);
+x.set(\freq, 920, \amp, 0.2);
+x.free;
+
+//define a synth
+(
+SynthDef.new("FSinOsc A440",
+	{
+		arg freq = 440,
+		amp = 0.2;
+		Out.ar(1,
+			FSinOsc.ar(
+				freq,
+				0,
+				amp)
+		)
+	}
+).send(s);
+)
+//create an instance of it
+z = Synth.new("FSinOsc A440");
+//set some parameters on the fly
+z.set(\freq, 880);
+z.set(\freq, 440);
+z.set(\amp, 0.4);
+z.set(\amp, 0.1);
+//stop it
+z.free;
