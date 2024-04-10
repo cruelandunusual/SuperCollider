@@ -167,3 +167,21 @@ z.set(\amp, 0.4);
 z.set(\amp, 0.1);
 //stop it
 z.free;
+
+/*
+ * A wee bit from the SuperCollider book
+ * Using an array as the SynthDef freq argument
+ */
+(
+SynthDef(\UGen_ex1b,
+	{
+		arg freq = [440, 446, 448.5, 882],
+		amp = 0.1;
+		Out.ar(0, SinOsc.ar(freq, 0, amp))
+	}
+).send(b);
+)
+a = Synth.new(\UGen_ex1b);
+a.set(\freq, [220, 326, 400, 600]);
+a.set(\freq, [440, 446, 448.5, 882]);
+a.free;
