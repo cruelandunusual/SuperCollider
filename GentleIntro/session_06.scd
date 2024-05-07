@@ -48,13 +48,14 @@ x.free;
    doesn't work, so there's obviously some syntax thing I'm
    not doing properly
 */
-arg amp = 0.05;
+var maxAmp = 0.05;
+~a = 0.05;
 SynthDef.new(
 	\kegofbeer,
 	{
 		Out.ar(0, SinOsc.ar(
-			freq: MouseX.kr(100,600),
-			mul: MouseY.kr(0, amp)
+			freq: MouseX.kr(minval: 100, maxval: 600),
+			mul: MouseY.kr(minval: 0, maxval: ~a)
 		)
 		)
 	}
@@ -62,7 +63,25 @@ SynthDef.new(
 )
 
 x = Synth.new(\kegofbeer);
-x.set(\amp, 0.9); //evaluating this doesn't change the running synth
+~a = 0.5;
+x.set(~a); //evaluating this doesn't change the running synth
 x.free;
 
 {SinOsc.ar(MouseX.kr(40, 1000, 1), 0, 0.1)}.play;
+
+/*
+ * Tue 07-05-2024
+ * Continuing the
+ * UGens chapter
+ */
+(
+x = {
+	arg freq = 440, amp = 0.1;
+	SinOsc.ar(
+		freq, 0, amp)
+}.play;
+)
+x.set(\freq, 778);
+x.set(\amp, 0.5);
+x.set(\freq, 920, \amp, 0.2);
+x.free;
