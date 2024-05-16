@@ -39,8 +39,8 @@ named the arguments
 
 /*
  * Wed 15-05-2024
- * Back to the start of the
- * book!
+ * more stuff from the
+ * first chapter
  */
 
 // 8 The last thing always gets posted
@@ -85,4 +85,31 @@ d.postln;
 ~myFreqs = [415, 220, 440, 880, 220, 990];
 ~myDurations = [0.1, 0.2, 0.2, 0.5, 0.2, 0.1];
 Pbind(\freq, Pseq(~myFreqs), \dur, Pseq(~myDurations)).play;
+
+/*
+ * Thu 16-05-2024
+ * more on global vs local
+ * variables
+ */
+
+// Environment variables
+~galaApples = 4;
+~bloodOranges = 5;
+~limes = 2;
+~plantains = 1;
+
+["Citrus", ~bloodOranges + ~limes];
+["Non-citrus", ~plantains + ~galaApples];
+
+// Local variables: valid only within the code block.
+// Evaluate the block once and watch the Post window.
+(
+var apples = 4, oranges = 3, lemons = 8, bananas = 10;
+["Citrus fruits", oranges + lemons].postln;
+["Non-citrus fruits", bananas + apples].postln;
+"End".postln;
+)
+
+~galaApples; // still exists
+apples; // doesn't exist outside the block
 
