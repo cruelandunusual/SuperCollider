@@ -113,3 +113,17 @@ var apples = 4, oranges = 3, lemons = 8, bananas = 10;
 ~galaApples; // still exists
 apples; // doesn't exist outside the block
 
+/*
+ * Fri 17-05-2024
+ * Patterns
+ */
+
+Pbind(\degree, Pseries(0, 1, 30), \dur, 0.05).play;
+Pbind(5, 0).play;
+Pbind(Pseries(4,5), 0).play;
+
+// plays middle C once per second indefinitely
+Pbind(\degree, 0).play; // 0 means first scale degree, C major is assumed
+
+Pbind(\degree, [0,4,6], \dur, 0.3).play;
+
