@@ -123,7 +123,16 @@ Pbind(5, 0).play;
 Pbind(Pseries(4,5), 0).play;
 
 // plays middle C once per second indefinitely
-Pbind(\degree, 0).play; // 0 means first scale degree, C major is assumed
+Pbind(\degree, 0, \dur, 0.5).play; // 0 means first scale degree, C major is assumed
 
 Pbind(\degree, [0,4,6], \dur, 0.3).play;
 
+/*
+ * Tue 21-05-2024
+* More patterns: Pseq(), etc
+ */
+
+Pbind(\degree, Pseq([0, 1, 2, 3, 4, 5, 6, 7], 1), \dur, 0.2).play;
+
+
+Pbind(\degree, Pseq([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], inf), \dur, Pseq([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], inf)).play;
