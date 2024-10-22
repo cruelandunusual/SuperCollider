@@ -8,7 +8,7 @@
 
 { SinOsc.ar(freq: MouseX.kr(100,600), mul: MouseY.kr(0, 0.03)) }.play;
 
-{ Pulse.ar(freq: MouseX.kr(100,600, warp: 2), mul: 0.03) }.scope;
+{ LFTri.ar(freq: MouseX.kr(100,600, warp: 2), mul: 0.03) }.scope;
 
 //define a synth
 /*
@@ -20,7 +20,7 @@ some old examples I wrote to get it correct
 SynthDef.new(
 	\kegofbeer,
 	{
-		Out.ar(0, SinOsc.ar(
+		Out.ar(0, LFTri.ar(
 			freq: MouseX.kr(100,600),
 			mul: MouseY.kr(0, 0.03)
 		)
@@ -30,4 +30,5 @@ SynthDef.new(
 )
 
 x = Synth.new(\kegofbeer);
+
 x.free;
