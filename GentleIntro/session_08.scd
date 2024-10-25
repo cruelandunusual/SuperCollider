@@ -21,5 +21,21 @@ s.volume.gui;
 )
 /////////
 
-{RLPF.ar(Dust.ar([100, 500]), LFNoise1.ar([0.3, 0.2]).range(100, 3000), 0.02)}.play;
+~a = rrand(30,70);
+~b = rrand(1000,3000);
+(
+{RLPF.ar(Dust.ar([100, 500]), LFNoise0.ar([0.3, 0.2]).range(~a, ~b), 0.02)}.play;
 s.volume.gui;
+)
+
+rrand(10,20);
+
+5 + 2 * 2.squared;
+
+
+
+{Saw.ar(LFNoise0.kr([5,9]).range(~a,~b),LFPulse.kr([4,5]) * 0.1)}.play;
+
+x = 10;
+x==10;
+
