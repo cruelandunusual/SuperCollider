@@ -1,7 +1,7 @@
 ServerOptions.devices;
 
 Server.default.options.device = "Windows DirectSound";
-Server.default.options.device = "ASIO : ASIO4ALL v2";
+Server.default.options.device = "ASIO : ASIO4ALL v2"; // use this for no conflicts with browser
 Server.default.options.device = "ASIO : Generic Low Latency ASIO Driver";
 
 x = {SinOsc.ar(880.0, 9.0, 1.0, 1.0)};
@@ -22,5 +22,31 @@ c.free;
 
 x = {SinOsc.ar(600) * 0.25}.play;
 x.free;
+
+
+(
+z = {
+	arg freq=440, amp=1;
+	var sig;
+	sig = SinOsc.ar(freq) * amp;
+}.play;
+)
+z.free;
+
+z.set(\freq,660, \amp, 0.8);
+
+
+(
+z = {
+	arg noiseHz = 8;
+	var freq, amp, sig;
+	freq = LFNoise0.kr(noiseHz).exprange(exprand(50,300),1000);
+	amp = LFNoise0.kr(12).exprange(0.02,1);
+	sig = SinOsc.ar(freq) * amp;
+}.play;
+)
+z.free;
+
+z.set(\noiseHz, exprand(4,64));
 
 
