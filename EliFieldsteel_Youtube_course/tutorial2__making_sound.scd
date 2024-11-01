@@ -3,14 +3,13 @@ ServerOptions.devices;
 Server.default.options.device = "Windows DirectSound";
 Server.default.options.device = "ASIO : ASIO4ALL v2"; // use this for no conflicts with browser
 Server.default.options.device = "ASIO : Generic Low Latency ASIO Driver";
+s.boot;
 
 x = {SinOsc.ar(880.0, 9.0, 1.0, 1.0)};
-
 y = x.play;
-
 y.free;
 
-s.boot;
+
 
 m = 10;
 b = { Blip.ar(Blip.kr(4*m, 5*m, 500*m, 60*m).poll(), 59, 0.1) };
@@ -50,3 +49,13 @@ z.free;
 z.set(\noiseHz, exprand(4,64));
 
 
+(
+z = { //make a function with curly brackets
+	arg noiseHz = 8; //declare args before vars
+	var freq, amp, sig;
+	freq = LFNoise0.kr(noiseHz).exprange(50,1000);
+	amp = LFNoise0.kr(12).exprange(0.02,0.75);
+	sig = SinOsc.ar(freq) * amp;
+}.play;
+)
+z.free;
