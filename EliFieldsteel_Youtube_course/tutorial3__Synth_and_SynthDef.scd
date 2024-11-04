@@ -54,14 +54,15 @@ SynthDef.new(\sawTest, {
 	 */
 	arg noiseHz = 8; //declare args before vars
 	var freq, amp, sig;
-	freq = LFNoise0.kr(noiseHz).exprange(200,1000);
-	amp = LFNoise0.kr(12).exprange(0.02,0.75);
+	freq = LFNoise2.kr(noiseHz).exprange(200,1000);
+	amp = LFNoise2.kr(12).exprange(0.02,0.75);
 	sig = Saw.ar(freq) * amp;
 	Out.ar(0, sig);
 }).add;
 )
 
 y = Synth.new(\sawTest);
+y.set(\noiseHz, 8);
 y.free;
 
 
