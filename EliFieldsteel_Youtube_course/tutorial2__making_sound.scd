@@ -46,7 +46,7 @@ z = {
 )
 z.free;
 
-z.set(\noiseHz, exprand(4,64));
+z.set(\noiseHz, exprand(4, 16));
 
 
 (
@@ -59,3 +59,23 @@ z = { //make a function with curly brackets
 }.play;
 )
 z.free;
+
+
+
+(
+a = {//make a function with curly brackets
+	arg noiseHz = 9;
+	var freq, amp, signal;
+	freq = SinOsc.kr(noiseHz).exprange(50,100);
+	amp = SinOsc.kr(2);
+	/*
+	note the creation of an oscillator
+	freq is the argument, multiply the result by amp
+	*/
+	signal = SinOsc.ar(freq) * amp;
+}.play;
+)
+a.set(\noiseHz, 800);
+a.free;
+
+

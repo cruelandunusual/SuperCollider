@@ -1,6 +1,9 @@
-ServerOptions.devices;
+
 s.plotTree;
+ServerOptions.devices;
 Server.default.options.device = "Windows DirectSound";
+Server.default.options.device = "MME";
+Server.default.options.device = "Windows WASAPI";
 Server.default.options.device = "ASIO : ASIO4ALL v2"; // use this for no conflicts with browser
 Server.default.options.device = "ASIO : Generic Low Latency ASIO Driver";
 s.boot;
@@ -25,7 +28,11 @@ z.free;
  The same UGen function as a SynthDef
 */
 (
-SynthDef.new(\sineTest, { //make a function with curly brackets
+SynthDef.new(\sineTest, {
+	/*
+	 *SynthDef.new creates a synthdef from a UGen function;
+	 *give it a name using the backslash char (or quotes)
+	 */
 	arg noiseHz = 8; //declare args before vars
 	var freq, amp, sig;
 	freq = LFNoise0.kr(noiseHz).exprange(200,1000);
@@ -37,3 +44,24 @@ SynthDef.new(\sineTest, { //make a function with curly brackets
 
 x = Synth.new(\sineTest);
 x.free;
+
+
+(
+SynthDef.new(\sawTest, {
+	/*
+	 *SynthDef.new creates a synthdef from a UGen function;
+	 *give it a name using the backslash char (or quotes)
+	 */
+	arg noiseHz = 8; //declare args before vars
+	var freq, amp, sig;
+	freq = LFNoise0.kr(noiseHz).exprange(200,1000);
+	amp = LFNoise0.kr(12).exprange(0.02,0.75);
+	sig = Saw.ar(freq) * amp;
+	Out.ar(0, sig);
+}).add;
+)
+
+y = Synth.new(\sawTest);
+y.free;
+
+
