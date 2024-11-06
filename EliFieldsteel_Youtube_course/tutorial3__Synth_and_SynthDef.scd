@@ -52,9 +52,13 @@ SynthDef.new(\sawTest, {
 	 *SynthDef.new creates a synthdef from a UGen function;
 	 *give it a name using the backslash char (or quotes)
 	 */
-	arg noiseHz = 8; //declare args before vars
+	arg noiseHz = 8, exp1 = 200, exp2 = 1000; //declare args before vars
+/*	arg ;
+	arg exp2 = 1000;*/
 	var freq, amp, sig;
-	freq = LFNoise2.kr(noiseHz).exprange(200,1000);
+	var expLower = 100;
+	var expUpper = 1000;
+	freq = LFNoise2.kr(noiseHz).exprange(expLower, expUpper);
 	amp = LFNoise2.kr(12).exprange(0.02,0.75);
 	sig = Saw.ar(freq) * amp;
 	Out.ar(0, sig);
@@ -62,7 +66,8 @@ SynthDef.new(\sawTest, {
 )
 
 y = Synth.new(\sawTest);
-y.set(\noiseHz, 8);
+y.set(\noiseHz, 8*3);
+y.set(\expUpper, 10);
 y.free;
 
 
