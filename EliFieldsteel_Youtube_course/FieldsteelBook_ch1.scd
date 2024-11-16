@@ -17,12 +17,18 @@ SinOsc.browse;
 SinOsc.class;
 
 (
-{
+x = {
 	var a;
 	a = FSinOsc.ar(880);
-	[a.neg, a.reciprocal ]
-}.play;
+	//[a.neg, a.reciprocal ]
+}
 )
+
+
+y = x.play;
+
+y.free;
+
 
 
 10.rand;
@@ -41,12 +47,26 @@ SinOsc.class;
 
 Integer.browse;
 Float.browse;
+Float.class;
 
 345.neg();
 neg(345);
 
-/*
-nominally at page 17 of Fieldsteel chapter 1
-file:///D:/Programming/Supercollider%20Eli%20Fieldsteel-chapter-1.pdf
-but I've been digressing with my own stuff a  bit too
-*/
+2** 3;
+2.cubed();
+
+3.round(2);
+
+2.pow(3);
+
+Boolean.class;
+
+0.3.coin;
+
+x = 3;
+y = 4;
+x;
+y = x.dup(3);
+x;
+y;
+
