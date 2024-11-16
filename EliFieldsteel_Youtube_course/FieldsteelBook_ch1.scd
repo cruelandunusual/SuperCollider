@@ -20,7 +20,7 @@ SinOsc.class;
 {
 	var a;
 	a = FSinOsc.ar(880);
-	[neg(a), a.reciprocal ]
+	[a.neg, a.reciprocal ]
 }.play;
 )
 
@@ -33,3 +33,20 @@ SinOsc.class;
 0.coin;
 
 {SinOsc.ar(110).coin}.plot;
+
+1 + 1.0.asBinaryArchive;
+
+
+345.asBinaryDigits;
+
+Integer.browse;
+Float.browse;
+
+345.neg();
+neg(345);
+
+/*
+nominally at page 17 of Fieldsteel chapter 1
+file:///D:/Programming/Supercollider%20Eli%20Fieldsteel-chapter-1.pdf
+but I've been digressing with my own stuff a  bit too
+*/
