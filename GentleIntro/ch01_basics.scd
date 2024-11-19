@@ -34,3 +34,15 @@ a = {
 // generate a random number between the parameters passed
 rrand(10,20);
 
+// array notation
+b = [0, 1, 2, 3, 4].scramble;
+b[2];
+
+// messing with Pbinds. I don't know what's going on here,
+// seems Pbinds are quite different from SynthDefs.
+// setting var 'a' equal to Pbind and evaluating a.play
+// doesn't work. Pbinds are EvenStreamPlayers, whatever that is.
+c = Pbind('note', Pwhite(0, 10), \dur, 0.1);
+c.play;
+
+Pbind(\note, [1,5,8], \dur, 0.9).play;
