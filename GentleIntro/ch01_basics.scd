@@ -38,11 +38,14 @@ rrand(10,20);
 b = [0, 1, 2, 3, 4].scramble;
 b[2];
 
-// messing with Pbinds. I don't know what's going on here,
-// seems Pbinds are quite different from SynthDefs.
-// setting var 'a' equal to Pbind and evaluating a.play
-// doesn't work. Pbinds are EvenStreamPlayers, whatever that is.
+// messing with Pbinds.
 c = Pbind('note', Pwhite(0, 10), \dur, 0.1);
-c.play;
+d = c.play;
+d.free; // doesn't work for a Pbind?
 
 Pbind(\note, [1,5,8], \dur, 0.9).play;
+
+/*
+ The keyword \degree refers to scale degrees
+*/
+Pbind(\degree, 0).play;
