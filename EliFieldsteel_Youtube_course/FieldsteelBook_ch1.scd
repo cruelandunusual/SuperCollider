@@ -1,6 +1,10 @@
+s.plotTree;
+
 ~result = 4.squared;
 squared(4);
 ~result.cubed-96.postln;
+
+~result.postln;
 
 {SinOsc.ar()}.play;
 
@@ -31,12 +35,12 @@ y.free;
 
 
 
-10.rand;
+10.rand; //generates a random number between 0 and 9
 
 {SinOsc.ar(440).sum3rand}.plot;
 
 
-0.coin;
+5.coin;
 
 {SinOsc.ar(110).coin}.plot;
 
@@ -52,7 +56,7 @@ Float.class;
 345.neg();
 neg(345);
 
-2** 3;
+2**3;
 2.cubed();
 
 3.round(2);
@@ -70,4 +74,30 @@ y = x.dup(3);
 x;
 y;
 
-if(x == y)
+1 + (4 + 2).pow(3);
+10.do({"test".postln});
+
+20.do({0.5.coin.postln});
+
+10.do({[1, 2, 3].choose.postln});
+
+//if(x == y)
+
+
+35.isInteger;
+
+(
+
+var num;
+num.isNil.postln;
+num = 2;
+num.isNil.postln;
+
+)
+
+
+(
+~list = [2, 3, 4];
+~list[0];
+)
+
