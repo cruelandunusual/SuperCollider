@@ -98,6 +98,27 @@ num.isNil.postln;
 
 (
 ~list = [2, 3, 4];
-~list[0];
+
+"element 0 of the array contains"+~list[0].class + "of value" + ~list[0].postln;
+~list = ~list.add(5).squared;
+~message = ("now the list contains"+~list).dup;
+~message.postln;
+"element 0 of the array contains"+~list[0].class + "of value" + ~list[0].postln;
+~list.dup;
 )
+
+(
+f = { |input1 = 2, input2 = 6|
+	//arg input = 2; //default value of 2 if no argument supplied
+	var num;
+	num = input1.squared;
+	num = input2.reciprocal;
+};
+)
+
+f.value;
+f.(5, 10);
+
+5.squared;
+25.reciprocal;
 
