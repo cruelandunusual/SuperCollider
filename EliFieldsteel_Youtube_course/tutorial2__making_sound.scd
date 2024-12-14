@@ -3,7 +3,10 @@ ServerOptions.devices;
 Server.default.options.device = "Windows DirectSound";
 Server.default.options.device = "ASIO : ASIO4ALL v2"; // use this for no conflicts with browser
 Server.default.options.device = "ASIO : Generic Low Latency ASIO Driver";
+
 s.boot;
+s.quit;
+
 
 x = {SinOsc.ar(880.0, 9.0, 1.0, 1.0)};
 y = x.play;
@@ -77,5 +80,7 @@ a = {//make a function with curly brackets
 )
 a.set(\noiseHz, 800);
 a.free;
+
+
 
 

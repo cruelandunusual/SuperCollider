@@ -1,4 +1,5 @@
 s.plotTree;
+s.quit;
 
 ~result = 4.squared;
 squared(4);
@@ -122,3 +123,7 @@ f.(5, 10);
 5.squared;
 25.reciprocal;
 
+
+
+5;
+5&3;
