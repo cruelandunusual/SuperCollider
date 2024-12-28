@@ -1,3 +1,5 @@
+s.boot;
+
 s.plotTree;
 s.quit;
 
