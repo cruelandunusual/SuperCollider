@@ -4,6 +4,8 @@ s.plotTree;
 s.quit;
 
 ~result = 4.squared;
+~longVarName = 4.reciprocal;
+squared(~longVarName);
 squared(4);
 ~result.cubed-96.postln;
 
@@ -43,12 +45,15 @@ y.free;
 {SinOsc.ar(440).sum3rand}.plot;
 
 
-5.coin;
+0.3.coin;
 
-{SinOsc.ar(110).coin}.plot;
+{SinOsc.ar(110).coin}.play;
 
 1 + 1.0.asBinaryArchive;
+1.0.asBinaryArchive;
 
+1.asBinaryArchive;
+1.asBinaryDigits;
 
 345.asBinaryDigits;
 
