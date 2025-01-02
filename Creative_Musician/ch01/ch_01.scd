@@ -1,9 +1,9 @@
-s.boot;
+s.boot; // boot the server with the reserved variable s
 
-s.plotTree;
-s.quit;
+s.plotTree; // plotTree shows server objects
+s.quit; // um, quit
 
-~result = 4.squared;
+~result = 4.squared; // numbers are objects in SC
 ~longVarName = 4.reciprocal;
 squared(~longVarName);
 squared(4);
