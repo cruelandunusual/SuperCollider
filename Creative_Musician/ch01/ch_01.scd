@@ -5,26 +5,32 @@ s.quit; // um, quit
 
 ~result = 4.squared; // numbers are objects in SC
 ~longVarName = 4.reciprocal;
-squared(~longVarName);
+squared(~longVarName); // alternative function invocation syntax
 squared(4);
+/* the last thing computed is displayed in the post window, but postln will print whatever it's called to print */
 ~result.cubed-96.postln;
-
 ~result.postln;
 
+// the most minimal audio example
 {SinOsc.ar()}.play;
 
 {SinOscFB.ar()}.play;
 
-SinOsc.browse;
+SinOsc.browse; // displays the class browser window for the respective object
 
-4.class;
-"Text".class;
-4.0.class;
+4.browse; // doesn't work
 
-4.0 * 3.0;
+4.class; // but this does -> Integer
+"Text".class; // this also works -> String
+4.0.class; // -> Float
 
-SinOsc.class;
+4.0 * 3.0; // -> 12.0
 
+SinOsc.class; // -> Meta_SinOsc
+
+
+
+/* a minimal function definition, stored in variable 'x' */
 (
 x = {
 	var a;
@@ -33,21 +39,20 @@ x = {
 }
 )
 
+y = x.play; // play x and store the resulting synth in y
 
-y = x.play;
-
-y.free;
+y.free; // free the synth stored in y
 
 
 
 10.rand; //generates a random number between 0 and 9
 
-{SinOsc.ar(440).sum3rand}.plot;
+{SinOsc.ar(440).sum3rand}.plot; // .plot displays a graph of the audio wave
 
-
+/* .coin emulates a toin coss, called on 0.3 it gives a 30% chance of returning true */
 0.3.coin;
 
-{SinOsc.ar(110).coin}.play;
+{SinOsc.ar(110).coin}.plot;
 
 1 + 1.0.asBinaryArchive;
 1.0.asBinaryArchive;
@@ -115,17 +120,41 @@ num.isNil.postln;
 ~list.dup;
 )
 
+
+/*
+------------------------------------------------------------------
+
+Functions
+
+------------------------------------------------------------------
+*/
+
+// Defining and evaluating a function with an argument
 (
-f = { |input1 = 2, input2 = 6|
-	//arg input = 2; //default value of 2 if no argument supplied
+f = {
+	arg input = 4; // set default value for input if no value given when calling
+	var num;
+	num = input.squared;
+	num.postln;
+	num = num.reciprocal;
+	num.postln;
+};
+)
+f.();
+
+
+/* Defining and evaluating a function with multiple arguments
+   declared unsing the "pipe" syntax */
+(
+g = { |input1 = 2, input2 = 6|
 	var num;
 	num = input1.squared;
 	num = input2.reciprocal;
 };
 )
 
-f.value;
-f.(5, 10);
+g.value;
+g.(5, 10);
 
 5.squared;
 25.reciprocal;
@@ -133,4 +162,8 @@ f.(5, 10);
 
 
 5;
-5&3;
+5&3; // bitwise AND -> 1
+
+
+
+
