@@ -16,6 +16,10 @@ s.options.blockSize;
 {PinkNoise.ar(mul:1) ! 2}.play;
 
 
+/******************************/
+/* UGen functions             */
+/******************************/
+
 // Code example 2.1
 {SinOsc.ar(freq:300, phase:0, mul:0.1, add:0)}.play; // left speaker only
 
@@ -36,3 +40,118 @@ x = {
 
 x.set(\freq, 1700);
 x.free();
+
+// Code example 2.5 -- use of set messages with
+// a UGen function containing multiple arguments
+(
+x = {
+	| freq = 300, amp = 0.1| // pipe arg format
+	SinOsc.ar(mul: amp, freq: freq) ! 2; // frequency always assumed to be first
+	// if setting a different order, arguments must all be named with colon syntax
+}.play;
+)
+
+x.set(\freq, 1700, \amp, 0.2);
+x.set(\amp, 0.4, \freq, 660); // order of arguments doesn't matter
+x.set(\freq, 200);
+x.set(\amp, 0.1);
+x.free();
+
+
+// Code example 2.6 -- function.play construct
+// separating defining and playing a UGen function
+// into two discrete actions
+(
+// define the sound
+f = { |freq = 300, amp = 0.1|
+	SinOsc.ar(freq, mul: amp) ! 2;
+};
+)
+
+x = f.play;
+
+x.set(\freq, 440);
+f.set(\freq, 300, \amp, 0.2); // doesn't affect the synth object x that's playing
+
+
+// Code example 2.7 -- overriding default argument values
+// when calling play on a UGen function
+(
+f = { |freq = 300, amp = 0.1|
+	SinOsc.ar(freq: freq, mul: amp) ! 2;
+};
+)
+x = f.play(args: [freq: 800, amp: 0.2]); //override defaults when calling play
+x.set(\freq, 300, \amp, 0.1);
+
+// Code example 2.8 -- using free to stop
+// processes individually
+(
+f = { |freq = 300, amp = 0.1 |
+	SinOsc.ar(freq: freq, mul: amp) ! 2;
+};
+)
+x = f.play(args: [freq: 350]);
+y = f.play(args: [freq: 450]);
+x.free;
+y.free;
+
+// Code example 2.9 -- using release to stop processes gradually
+(
+f = { |freq = 300, amp = 0.1 |
+	SinOsc.ar(freq: freq, mul: amp) ! 2;
+};
+)
+x = f.play(args: [freq: 350]);
+y = f.play(args: [freq: 450]);
+x.release(0.3); // 0.3 secs
+y.release(30); // 30 secs
+
+/******************************/
+/* Math operations with UGens */
+/******************************/
+
+// Code example 2.10 -- using addition to mix a sine wave with pink noise
+(
+x = {
+	var sig;
+	sig = SinOsc.ar(1200, mul: 0.15);
+	sig = sig + PinkNoise.ar(mul: 0.1);
+	sig = sig * 0.1; // make it very quiet (it's already quiet before this
+	sig = sig ! 2; // make it stereo
+}.play;
+)
+x.release(0.4);
+
+// Code example 2.11 -- using binary operators as an alternative
+// to specifying values for mul and add.
+(
+x = {
+	var sig;
+	sig = SinOsc.ar(1200) * 0.15; // alternative way to set the UGen volume using multiplication operator
+	sig = sig + PinkNoise.ar * 0.1;
+	sig = sig ! 2; // make it stereo
+}.play;
+)
+x.release(0.4);
+
+// tip.rand() -- a UGen function plays the last expression
+// The function below only plays the pink noise
+(
+{
+	var sig0, sig1;
+	sig0 = SinOsc.ar(300, mul: 0.15) ! 2;
+	sig1 = PinkNoise.ar(mul: 0.1) ! 2;
+}.play;
+)
+
+// This version plays both sine wave and noise
+(
+{
+	var sig0, sig1;
+	sig0 = SinOsc.ar(300, mul: 0.15) ! 2;
+	sig1 = PinkNoise.ar(mul: 0.1) ! 2;
+	sig0 + sig1;
+}.play;
+)
+

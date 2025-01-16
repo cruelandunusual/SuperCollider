@@ -6,3 +6,9 @@ Server.default.options.device = "ASIO : Generic Low Latency ASIO Driver";
 
 s.boot;
 s.quit;
+Server.killAll;
+
+ScIDE.send(\requestDocumentList); // use this if getting the Text Mirror error message...
+
+// Use this to calibrate hardware volume levels
+{PinkNoise.ar(mul:1) ! 2}.play;
