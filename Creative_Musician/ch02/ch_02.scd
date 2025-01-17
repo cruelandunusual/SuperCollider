@@ -107,6 +107,7 @@ y = f.play(args: [freq: 450]);
 x.release(0.3); // 0.3 secs
 y.release(30); // 30 secs
 
+
 /******************************/
 /* Math operations with UGens */
 /******************************/
@@ -154,4 +155,42 @@ x.release(0.4);
 	sig0 + sig1;
 }.play;
 )
+
+// Code example 2.12 -- modulating the amplitude of pink noise
+// with a low frequency oscillator
+(
+x = {
+	var sig, lfo;
+	lfo = SinOsc.kr(freq: 0.2, phase: 3pi/2, mul: 0.1, add: 0.1);
+	sig = PinkNoise.ar * lfo;
+	sig = sig ! 2;
+}.play;
+)
+x.release(2);
+
+(
+x = {
+	var sig, lfo;
+	lfo = SinOsc.kr(freq: 0.2, phase: 3pi/2, mul: 0.1, add: 0.15); // low frequency oscillator
+	sig = SinOsc.ar(freq: 440, phase: 0.0, mul: 0.1, add: 0.0) * lfo; // multiply the audio signal by the lfo
+	sig = sig ! 2; // make it stereo
+}.play;
+)
+x.release(2);
+
+// Code example 2.13 -- use of range to specify
+// custom output boundaries of a UGen
+(
+x = {
+	var sig, lfo;
+	lfo = SinOsc.kr(freq: 0.2, phase: 3pi/2).curverange(0, 0.2, -1);
+	sig = (PinkNoise.ar * lfo) ! 2;
+}.play;
+)
+x.release(2);
+
+
+/******************************/
+/* Envelopes                  */
+/******************************/
 
