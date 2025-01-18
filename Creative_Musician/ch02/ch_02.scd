@@ -194,3 +194,44 @@ x.release(2);
 /* Envelopes                  */
 /******************************/
 
+// Code example 2.14 -- usage of line and xline as
+// simple amplitude envelopes
+(
+x = {
+	var sig, env;
+	env = Line.kr(start: 0.4, end: 0.0, dur: 1.0, doneAction: 2); // doneAction 2 frees the synth from the server
+	sig = (SinOsc.ar(freq: 440) * env) ! 2;
+}.play;
+)
+
+(
+x = {
+	var sig, env;
+	env = XLine.kr(start: 0.6, end: 0.0001, dur: 1.0, doneAction: 2); // end value of XLine can't be zero
+	sig = (SinOsc.ar(freq: 440) * env) ! 2;
+}.play;
+)
+
+// Code example 2.16 -- creating and plotting an
+// instance of Env
+(
+e = Env.new(levels: [0,0.5,0], times: [1,3], curve: [8, -8]);
+e.plot;
+)
+
+// Code example 2.17 -- usage of Env and EnvGen to
+// create a custom amplitude envelope signal
+(
+{
+	var sig, env;
+	env = EnvGen.kr(
+		envelope: Env.new(
+			levels: [0,1,0],
+			times: [1,3],
+			curve: \sin),
+		doneAction: 2 );
+	sig = SinOsc.ar(freq: 440) * 0.3; // set amplitude of 0.3
+	sig = sig * env;
+	sig = sig ! 2;
+}.play;
+)
