@@ -215,7 +215,7 @@ x = {
 // Code example 2.16 -- creating and plotting an
 // instance of Env
 (
-e = Env.new(levels: [0,0.5,0], times: [1,3], curve: [8, -8]);
+e = Env.new(levels: [0, 0.5, 0], times: [1, 3], curve: [8, -8]);
 e.plot;
 )
 
@@ -226,12 +226,102 @@ e.plot;
 	var sig, env;
 	env = EnvGen.kr(
 		envelope: Env.new(
-			levels: [0,1,0],
-			times: [1,3],
-			curve: \sin),
+			levels: [0, 1, 0],
+			times: [1, 3],
+			curve: \sin
+		),
 		doneAction: 2 );
 	sig = SinOsc.ar(freq: 440) * 0.3; // set amplitude of 0.3
 	sig = sig * env;
 	sig = sig ! 2;
+}.plot;
+)
+
+// Code example 2.18 -- usage of Env and EnvGen
+// to create a gated envelope
+(
+f = { |gate = 1, freq = 440|
+	var sig, env;
+	env = EnvGen.kr(
+		envelope: Env.new(
+			levels: [1, 0.3, 0.2, 0],
+			times: [3, 0.3, 1],
+			curve: [0, -1, -4],
+			releaseNode: 2
+		),
+		gate: gate,
+		doneAction: 0 );
+	sig = SinOsc.ar(freq: freq) * 0.3; // set amplitude of 0.3
+	sig = sig * env;
+	sig = sig ! 2;
+};
+)
+
+x = f.play;
+x.set(\gate, 0);
+x.free();
+
+// Code example 2.19 -- a retriggerable gated envelope
+(
+f = { |gate = 1, freq = 440|
+	var sig, env;
+	env = EnvGen.kr(
+		envelope: Env.new(
+			levels: [1, 0.3, 0.2, 0],
+			times: [3, 0.3, 1],
+			curve: [0, -1, -4],
+			releaseNode: 2
+		),
+		gate: gate,
+		doneAction: 0 );
+	sig = SinOsc.ar(freq: freq) * 0.3; // set amplitude of 0.3
+	sig = sig * env;
+	sig = sig ! 2;
+};
+)
+
+x = f.play;
+x.set(\gate, 0);
+x.set(\gate, 1);
+x.set(\freq, 330);
+x.set(\freq, 660);
+x.free();
+
+// Code example 2.20 -- use of trigger-type arguments
+// to create a retriggerable fixed-duration envelope
+(
+x = { |t_gate = 0|
+	var sig, env;
+	env = EnvGen.kr(
+		envelope: Env.new(
+			levels: [0, 1, 0],
+			times: [0.2, 0.3],
+			curve: [0, -4],
+		),
+		gate: t_gate,
+	);
+	sig = SinOsc.ar(350) * 0.3;
+	sig = sig * env;
+	sig = sig ! 2;
 }.play;
 )
+x.set(\t_gate, 1); // evaluate repeatedly
+x.free;
+
+
+// PMS mucking about with different Env types (perc, etc)
+(
+x = { |t_gate = 0|
+	var sig, env;
+	env = EnvGen.kr(
+		envelope: Env.perc(
+		),
+		gate: t_gate,
+	);
+	sig = SinOsc.ar(350) * 0.3;
+	sig = sig * env;
+	sig = sig ! 2;
+}.play;
+)
+x.set(\t_gate, 1); // evaluate repeatedly
+x.free;
