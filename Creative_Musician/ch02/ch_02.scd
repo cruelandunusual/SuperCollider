@@ -344,9 +344,9 @@ x = {|t_gate = 0|
 		//envelope: Env.adsr,
 		envelope: Env.adsr(
 			attackTime: 0.01,
-			decayTime: 0.3,
+			decayTime: 0.9,
 			sustainLevel: 1.0,
-			releaseTime: 0.5,
+			releaseTime: 0.2,
 			peakLevel: 1.0,
 			curve: -4.0,
 			bias: 0.0
@@ -364,14 +364,15 @@ x.set(\t_gate, 1);
 
 /* plotting this envelope to work out why it produces such a quiet sound.
 The only value that's different from the default here is attackTime.
-I thnk a longer attackTime (as I've done with 0.9) doesn't work because it never
-has enough time to get to the max level. Just a suspicion*/
+I think a longer attackTime (as I've done with 0.9) doesn't work because it never
+has enough time to get to the max level. Just a thought though; when I plot it I can't
+see any obvious reason why it sounds so quiet*/
 (
 e = Env.adsr(
 	attackTime: 0.01,
-	decayTime: 0.3,
+	decayTime: 0.9,
 	sustainLevel: 1.0,
-	releaseTime: 0.5,
+	releaseTime: 0.2,
 	peakLevel: 1.0,
 	curve: -4.0,
 	bias: 0.0
@@ -395,3 +396,26 @@ a = Synth(\env_help);
 b = Synth(\env_help, [\release, 2]);
 a.set(\gate, 0); // alternatively, you can write a.release;
 b.set(\gate, 0);
+
+
+
+/*
+Testing if Env works in place of EnvGen -- it doesn't;
+an Env is used within an EnvGen
+*/
+(
+x = {|t_gate = 0, freq = 440|
+	var sig, env;
+	e = Env.new([0.001,0.7,0.001], [0.002,0.3], \sin);
+	env = EnvGen.kr(
+		e,
+		gate: t_gate,
+		doneAction: 0
+	);
+	sig = SinOsc.ar(freq: freq, mul: 0.8);
+	sig = sig * env;
+	sig = sig ! 2;
+}.play;
+)
+x.set(\t_gate, 1, \freq, 515);
+x.free;
