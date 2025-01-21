@@ -222,7 +222,7 @@ e.plot;
 // Code example 2.17 -- usage of Env and EnvGen to
 // create a custom amplitude envelope signal
 (
-{
+f = {
 	var sig, env;
 	env = EnvGen.kr(
 		envelope: Env.new(
@@ -234,8 +234,10 @@ e.plot;
 	sig = SinOsc.ar(freq: 440) * 0.3; // set amplitude of 0.3
 	sig = sig * env;
 	sig = sig ! 2;
-}.plot;
+};
 )
+f.play;
+f.plot;
 
 // Code example 2.18 -- usage of Env and EnvGen
 // to create a gated envelope
@@ -325,3 +327,71 @@ x = { |t_gate = 0|
 )
 x.set(\t_gate, 1); // evaluate repeatedly
 x.free;
+
+
+
+
+(
+e = Env.new(levels: [0, 0.5, 0], times: [1, 3], curve: [8, -8]);
+e.plot;
+)
+
+
+(
+x = {|t_gate = 0|
+	var sig, env;
+	env = EnvGen.kr(
+		//envelope: Env.adsr,
+		envelope: Env.adsr(
+			attackTime: 0.01,
+			decayTime: 0.3,
+			sustainLevel: 1.0,
+			releaseTime: 0.5,
+			peakLevel: 1.0,
+			curve: -4.0,
+			bias: 0.0
+		),
+		gate: t_gate,
+		doneAction: 0
+	);
+	sig = SinOsc.ar(mul: 0.8);
+	sig = sig * env;
+	sig = sig ! 2;
+}.play;
+)
+x.set(\t_gate, 1);
+
+
+/* plotting this envelope to work out why it produces such a quiet sound.
+The only value that's different from the default here is attackTime.
+I thnk a longer attackTime (as I've done with 0.9) doesn't work because it never
+has enough time to get to the max level. Just a suspicion*/
+(
+e = Env.adsr(
+	attackTime: 0.01,
+	decayTime: 0.3,
+	sustainLevel: 1.0,
+	releaseTime: 0.5,
+	peakLevel: 1.0,
+	curve: -4.0,
+	bias: 0.0
+);
+e.plot;
+)
+
+
+
+
+// From the Env help file:
+(
+SynthDef(\env_help, { |out, gate = 1, amp = 0.1, release = 0.1|
+    var env = Env.adsr(0.02, release, amp);
+    var gen = EnvGen.kr(env, gate, doneAction: Done.freeSelf);
+    Out.ar(out, PinkNoise.ar(1 ! 2) * gen)
+}).add
+);
+
+a = Synth(\env_help);
+b = Synth(\env_help, [\release, 2]);
+a.set(\gate, 0); // alternatively, you can write a.release;
+b.set(\gate, 0);
