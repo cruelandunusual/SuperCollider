@@ -360,6 +360,7 @@ x = {|t_gate = 0|
 }.play;
 )
 x.set(\t_gate, 1);
+x.free;
 
 
 /* plotting this envelope to work out why it produces such a quiet sound.
