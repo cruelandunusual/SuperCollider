@@ -311,7 +311,13 @@ x.set(\t_gate, 1); // evaluate repeatedly
 x.free;
 
 
-// PMS mucking about with different Env types (perc, etc)
+
+/*************************************************************/
+/*                                                           */
+/* PMS mucking about with different Env types (perc, etc)    */
+/*                                                           */
+/*************************************************************/
+
 (
 x = { |t_gate = 0|
 	var sig, env;
@@ -332,7 +338,7 @@ x.free;
 
 
 (
-e = Env.new(levels: [0, 0.5, 0], times: [1, 3], curve: [8, -8]);
+e = Env.new(levels: [0, 0.5, 0], times: [1, 3], curve: [-8, -8]);
 e.plot;
 )
 
@@ -415,8 +421,49 @@ x = {|t_gate = 0, freq = 440|
 	);
 	sig = SinOsc.ar(freq: freq, mul: 0.8);
 	sig = sig * env;
-	sig = sig ! 2;
+	sig = sig ! 5;
 }.play;
 )
 x.set(\t_gate, 1, \freq, 515);
 x.free;
+
+/*************************************************************/
+/*                                                           */
+/* PMS end of mucking about                                  */
+/*                                                           */
+/*************************************************************/
+
+/******************************/
+/* Multichannel signals       */
+/******************************/
+
+// a simple UGen plays from the left speaker only
+{LFSaw.ar(440, mul:0.05)}.play;
+
+// the dup method (or its symbolic shortcut, below, creates two UGens,
+// which SC plays on channels 0 and 1, corresponding to left and right
+{LFSaw.ar(440, mul:0.05)! 2}.play;
+
+// Code example 2.21 -- step-by-step depiction of multichannel expansion
+// This statement
+{SinOsc.ar([350,353]) * 0.2}.play;
+// is equivalent to
+{[SinOsc.ar(350), SinOsc.ar(353)] * 0.2}.play;
+//which is also equivalent to
+{[SinOsc.ar(350) * 0.2, SinOsc.ar(353) * 0.2]}.play;
+
+
+// Code example 2.22 -- UGen function involving a binary operation
+// between two multichannel signals. The 450 Hz tone is modulated
+// by a 1 Hz oscillator and the 800 Hz tone is modulated by
+// a 9 Hz oscillator
+(
+{
+	var sig, mod;
+	sig = SinOsc.ar([450, 800]);
+	//mod = SinOsc.kr([1, 9], mul:1.0);
+	mod = SinOsc.kr([1, 9]).range(0, 1);
+	sig = sig * mod;
+	sig = sig * 0.2;
+}.play;
+)
