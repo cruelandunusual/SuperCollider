@@ -467,3 +467,34 @@ x.free;
 	sig = sig * 0.2;
 }.play;
 )
+
+// Code example 2.23 -- Duplicating a UGen vs duplicating
+// a UGen arguement. With stochastic signals this produces
+// a uniquely different UGen.
+// these two expressions produce the same signal:
+{SinOsc.ar(300 ! 2, mul: 0.1)}.play;
+{SinOsc.ar(300, mul:0.1) ! 2}.play;
+
+{PinkNoise.ar(mul: 0.2) ! 2}.play; // "point" source between the speakers
+{PinkNoise.ar(mul: 0.2 ! 2)}.play; // "wide" source between the speakers
+
+
+// similar behaviour (not quite the same though) with random numbers
+{rrand(1,9)} ! 8;  // here a function generates a random number. The function is 'called' 8 times, which creates 8 new numbers.
+rrand(1,9) ! 8; // here a random number is generated and then reproduced 8 times.
+
+
+// Be mindful of just adding ! 2 to everything. This function below already would play the
+// SinOsc from the left and the PinkNoise from the right; adding the ! 2 means the array is
+// duplicated and the contents of each array are summed. So what ends up getting played by SC
+// is something like [SinOsc + PinkNoise] [SinOsc + PinkNoise], which doesn't sound anything
+// like [SinOsc] [PinkNoise]
+(
+{
+	var sig;
+	sig = [SinOsc.ar(300), PinkNoise.ar];
+	sig = sig * 0.1;
+	sig = sig ! 2;
+}.play;
+)
+
