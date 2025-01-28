@@ -494,7 +494,71 @@ rrand(1,9) ! 8; // here a random number is generated and then reproduced 8 times
 	var sig;
 	sig = [SinOsc.ar(300), PinkNoise.ar];
 	sig = sig * 0.1;
-	sig = sig ! 2;
+	//sig = sig ! 2;
 }.play;
 )
+
+// Code example 2.25 -- use of Pan2 to "move" a sound
+// in the stereophonic field
+(
+{
+	var sig, pan;
+	pan = SinOsc.kr(0.1) * 0.8; // why is this being multiplied by 0.8?
+	sig = PinkNoise.ar(mul:0.2);
+	sig = Pan2.ar(sig, pan);
+}.play;
+)
+
+// Code example 2.27 -- use of Splay to mix
+// 50 channels to a two-channel format
+(
+{
+	var sig, freq;
+	freq = {exprand(200, 2000)} ! 50; // make 50 random frequencies
+	sig = SinOsc.ar(freq) * 0.05; // since freq is an array of 50 random frequencies, this creates 50 SinOsc UGens
+	sig = Splay.ar(sig);
+}.play;
+)
+
+/******************************/
+/* SynthDef and Synth         */
+/******************************/
+// Using Synth and SynthDef is the only
+// way to create sound in SuperCollider.
+// When we invoke function.play a SynthDef
+// and Synth are created in the background
+
+// Code example 2.28 -- Simple UGen function to
+// illustrate the process of conversion to a SynthDef
+(
+x = {
+	var sig, osc;
+	osc = SinOsc.kr(1, mul:0.3, add:0.2);
+	sig = SinOsc.ar([350, 353], mul: osc);
+	sig = sig * 0.2;
+}.play;
+)
+x.free;
+
+// A SynthDef created from the code sample above.
+(
+SynthDef(\test, {
+	var sig, osc;
+	osc = SinOsc.kr(1, mul:0.3, add:0.2);
+	sig = SinOsc.ar([350, 353], mul: osc);
+	sig = sig * 0.2;
+	Out.ar(0, sig);
+}).add;
+)
+
+// Code example 2.30 -- Creating a Synth from the SynthDef above.
+x = Synth(\test);
+x.free;
+
+
+
+//////////////////
+
+
+{SinOsc.kr(1, add: 0).poll}.play; // polling an oscillator to see the numbers created
 
