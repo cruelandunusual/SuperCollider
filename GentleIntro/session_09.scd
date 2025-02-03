@@ -13,7 +13,7 @@ y.free;
 s.boot;
 
 m = 10;
-b = { Blip.ar(Blip.kr(4*m, 5*m, 500*m, 60*m).poll(), 59, 0.1) };
+b = { Blip.ar(Blip.kr(4*m, 5*m, 500*m, 60*m).poll(), 59, 0.2) ! 2};
 
 c = b.play;
 c.free;

@@ -540,7 +540,7 @@ x = {
 )
 x.free;
 
-// A SynthDef created from the code sample above.
+// Code example 2.29 -- A SynthDef created from the code sample above.
 (
 SynthDef(\test, {
 	var sig, osc;
@@ -557,8 +557,55 @@ x.free;
 
 
 
-//////////////////
 
+
+// Code example 2.31 -- A more flexibly designed synthdef with numberous arguments.
+(
+SynthDef.new(\test, {
+	arg freq = 350, amp = 0.2, atk = 0.01, dec = 0.3,
+	slev = 0.4, rel = 1, gate = 1, out = 0;
+	var sig, env;
+	env = EnvGen.kr(
+		Env.adsr(atk, dec, slev, rel),
+		gate,
+		doneAction: 2
+	);
+	sig = SinOsc.ar(freq + [0, 1]);
+	sig = sig * env;
+	sig = sig * amp;
+	Out.ar(out, sig);
+}).add;
+)
+
+x = Synth(\test);
+x.set(\freq, 210);
+x.set(\amp, 0.1);
+x.set(\gate, 0, \rel, 3);
+
+// Code example 2.32 -- Creating a synth with custom initial argument values
+x = Synth(\test, [freq: 800, amp: 0.1, atk: 4, slev: 0.1]);
+x.set(\gate, 0);
+
+
+//////////////////
 
 {SinOsc.kr(1, add: 0).poll}.play; // polling an oscillator to see the numbers created
 
+//////////////////
+
+// Code example 2.33 -- A pair of code expressions
+// that generate and fade a tone cluster
+
+(
+// return an array of four Synths, assigned to x
+x = [205, 310, 525, 700].collect({|f|
+	Synth.new(\test, [\freq, f, \amp, 0.1]);
+});
+)
+
+// fade out each Synth
+x.do({|n| n.set(\gate, 0, \rel, 5)});
+
+// PMS trying to work out what's going on in this strange syntax
+g = [100, 234, 399, 434].collect({|j| Synth.new(\test, [\freq, j, \amp, 0.1])});
+List[4857,39485,83475,34].collect({arg item; postln(item + 599)});
