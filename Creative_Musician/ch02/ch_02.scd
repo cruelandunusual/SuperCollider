@@ -514,7 +514,7 @@ rrand(1,9) ! 8; // here a random number is generated and then reproduced 8 times
 (
 {
 	var sig, freq;
-	freq = {exprand(200, 2000)} ! 50; // make 50 random frequencies
+	freq = {exprand(200, 2000)} ! 50; // make an array of 50 random frequencies
 	sig = SinOsc.ar(freq) * 0.05; // since freq is an array of 50 random frequencies, this creates 50 SinOsc UGens
 	sig = Splay.ar(sig);
 }.play;
@@ -607,5 +607,5 @@ x = [205, 310, 525, 700].collect({|f|
 x.do({|n| n.set(\gate, 0, \rel, 5)});
 
 // PMS trying to work out what's going on in this strange syntax
-g = [100, 234, 399, 434].collect({|j| Synth.new(\test, [\freq, j, \amp, 0.1])});
-List[4857,39485,83475,34].collect({arg item; postln(item + 599)});
+x = [100, 234, 399, 434].collect({|j| Synth.new(\test, [\freq, j, \amp, 0.1])});
+List[4857,39485,83475,34].collect({arg n; postln(n)});
