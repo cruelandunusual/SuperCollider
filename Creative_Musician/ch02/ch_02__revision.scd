@@ -16,16 +16,22 @@ FreqScope.new;
 }.scope;
 )
 
-/* Subtractive Synthesis - from
+
+
+/*********************************
+
+   Subtractive Synthesis - from
    https://composerprogrammer.com/teaching/supercollider/sctutorial/2.1%20Subtractive%20and%20Additive%20Synthesis.html
-*/
+
+
+**********************************/
 
 // Pure white noise, equal energy at all spectral frequencies
-{WhiteNoise.ar(mul:0.1)!2}.scope;
+{WhiteNoise.ar(mul:0.1)!2}.scope; // .scope plays the function AND opens a scope. Who knew!?
 
 // Filtered with a low pass filter
 // the WhiteNoise UGen is 'passed to' the LPF UGen as a parameter
-{LPF.ar(WhiteNoise.ar(mul:0.1), freq:2000, mul:1.0)}.scope;
+{LPF.ar(WhiteNoise.ar(mul:0.1), freq:1000, mul:1.0)!2}.scope;
 // the freq value is the filter cutoff, here it's fixed at 2000
 
 // if we want to vary the filter cutoff we can use a Line generator UGen
@@ -34,38 +40,22 @@ FreqScope.new;
 
 // but note we're using the kr method of the Line generator,
 // not the ar method (which does create sound on its own as above, but it's a brief click
-{LPF.ar(WhiteNoise.ar(mul:0.1), Line.kr(10000, 2, 2), mul:1.0)}.scope;
+{LPF.ar(WhiteNoise.ar(mul:0.1), XLine.kr(10000.0, 2.0, 12), mul:1.0)!2}.scope;
 
-
-
-
-
-/////////////
+// Another example of plugging a sound source (LFNoise0) into a filter (Resonz), with XLine to change the filter frequency
+{Resonz.ar(in: LFNoise0.ar(freq: 400), freq: XLine.kr(start: 10000.0, end: 1000.0, dur: 10.0), bwr: 0.1)!2}.scope;
+// This is more readable with local variables holding object references as we build the patch
 (
 {
-Mix(
-	Resonz.ar(			//The Resonz filter has arguments input, freq, rq=bandwidth/centre frequency
-		Saw.ar([440,443,437] + SinOsc.ar(100,0,100)), //frequency modulated sawtooth wave with chorusing
-		XLine.kr(10000,10,10), //vary filter bandwidth over time
-		Line.kr(1,0.05, 10), //vary filter rq over time
-		mul: LFSaw.kr(Line.kr(3,17,3),0,0.5,0.5)*Line.kr(1,0,10)  //AM
-	)
-)
-}.scope
-)
-/////////////////////
-
-(
-var w, carrfreqslider, modfreqslider, moddepthslider, synth;
-w=Window("frequency modulation", Rect(100, 400, 400, 300));
-w.view.decorator = FlowLayout(w.view.bounds);
-synth= {arg carrfreq=440, modfreq=1, moddepth=0.01;
-SinOsc.ar(carrfreq + (moddepth*SinOsc.ar(modfreq)),0,0.25)
+	var soundSource, filterFreq, filter;
+	soundSource = LFNoise0.ar(freq: 400);
+	filterFreq = XLine.kr(start: 10000.0, end: 1000.0, dur: 10.0);
+	filter = Resonz.ar(in: soundSource, freq: filterFreq, bwr: 0.1); // bwr = Bandwidth ratio (reciprocal of Q). rq = bandwidth / centerFreq.
+	filter.dup(2);
 }.scope;
-carrfreqslider= EZSlider(w, 300@50, "carrfreq", ControlSpec(20, 5000, 'exponential', 10, 440), {|ez|  synth.set(\carrfreq, ez.value)});
-w.view.decorator.nextLine;
-modfreqslider= EZSlider(w, 300@50, "modfreq", ControlSpec(1, 5000, 'exponential', 1, 1), {|ez|  synth.set(\modfreq, ez.value)});
-w.view.decorator.nextLine;
-moddepthslider= EZSlider(w, 300@50, "moddepth", ControlSpec(0.01, 5000, 'exponential', 0.01, 0.01), {|ez|  synth.set(\moddepth, ez.value)});
-w.front;
 )
+
+
+
+
+
