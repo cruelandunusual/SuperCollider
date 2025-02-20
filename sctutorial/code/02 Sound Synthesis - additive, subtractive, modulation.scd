@@ -1,0 +1,110 @@
+
+
+Sound Synthesis in SuperCollider: Subtractive and Additive Synthesis
+from Nick Collins' SuperCollider tutorials
+[ composerprogrammer.com ]
+
+
+**********************************/
+
+FreqScope.new; // open a Frequency analyser
+
+(
+{
+	//some code
+}.scope;
+)
+
+
+
+/*********************************
+
+Subtractive Synthesis
+In subtractive synthesis, we start
+with a complex source, and we subtract
+parts from this raw sound to make
+a more sculpted sound.
+This is also termed a source+filter model.
+
+**********************************/
+
+// Pure white noise, equal energy at all spectral frequencies
+{WhiteNoise.ar(mul:0.1)!2}.scope; // .scope plays the function AND opens a scope. Who knew!?
+
+// Filtered with a low pass filter
+// the WhiteNoise UGen is 'passed to' the LPF UGen as a parameter
+{LPF.ar(WhiteNoise.ar(mul:0.1), freq:2000, mul:1.0)!2}.scope;
+// the freq value is the filter cutoff
+
+// if we want to vary the filter cutoff we can use a Line generator UGen
+// plugged in to the freq argument slot
+{Line.ar(start:5000, end:1, dur:1, mul:0.002, doneAction:0)}.scope; // mul:0.002 to get rid of the loud click
+// the code above shows the frequency of the line filter
+
+// but note we're using the kr method of the Line generator,
+// not the ar method shown above (which does create sound on its own, but it's a brief click)
+{LPF.ar(WhiteNoise.ar(mul:0.1), XLine.kr(start:10000.0, end:2.0, dur:12), mul:1.0)!2}.scope;
+
+
+// all of this code is more readable when spaced out like this:
+{
+	LPF.ar(
+		in: WhiteNoise.ar(mul:0.1), // input signal
+		freq: XLine.kr(start:10000.0, end:2.0, dur:12), // XLine varies over time, so the LPF freq will vary over time
+		mul:1.0 // output multiplied by this value
+	).dup(2); //could use !2 here instead of dup method
+}.scope;
+
+
+// Another example of plugging a sound source (LFNoise0) into a filter (Resonz), with XLine to change the filter frequency
+{
+	Resonz.ar(
+		in: LFNoise0.ar(freq:400),
+		freq: XLine.kr(start:10000.0, end:1000.0, dur:10.0),
+		bwr:0.1).dup(2);
+
+}.scope;
+
+
+/*
+There are lots of possible sources and lots of possible filters
+
+some example sources:
+Oscillators:
+Saw
+Blip
+
+Noise Sources:
+PinkNoise
+LFNoise0
+
+some example filters:
+HPF
+BPF
+Resonz
+*/
+
+
+// This is more readable with local variables holding object references as we build the patch
+(
+f = {
+	 |filtStart = 100.0, filtEnd = 10000.0, filtDur = 5.0| // somehow this arg syntax seems to allow overriding
+	// more easily than declaring arg names as below: ...?
+	//arg filtStart, filtEnd, filtDur;
+	var soundSource, filterFreq, filter;
+	// default values for the filter
+	filtStart;// = 1000.0;
+	filtEnd;// = 10000.0;
+	filtDur;// = 5.0;
+
+	soundSource = LFNoise0.ar(freq:400, mul:0.2);
+	filterFreq = XLine.kr(start:filtStart, end:filtEnd, dur:filtDur);
+	filter = HPF.ar(in:soundSource, freq:filterFreq); // bwr = Bandwidth ratio (reciprocal of Q). rq = bandwidth / centerFreq.
+	filter.dup(2);
+};
+)
+g = f.play;
+g = f.play(args: [filtStart: 1000.0, filtEnd: 1.0, filtDur: 5.0]); //override defaults when calling play
+g.free;
+
+

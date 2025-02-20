@@ -1,0 +1,310 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf350
+{\fonttbl\f0\fnil\fcharset0 Monaco;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue191;\red0\green115\blue0;\red0\green0\blue191;
+\red0\green0\blue0;\red96\green96\blue96;\red191\green0\blue0;\red0\green115\blue0;\red191\green0\blue0;
+\red96\green96\blue96;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\fs48 \cf0 SynthDefs (Synth Definitions)\
+
+\fs36 \
+The \{\}.play notation is not the preferred one for SuperCollider 3, but it allowed us to get started with synthesis quickly. What you will often see from now on is use of the SynthDef construct to define networks of unit generators instead. Lots of synths are then created from a single SynthDef recipe, which is much more reusable, and especially important for making clouds of similar sounds and other granular and ensemble processes. \
+\
+SynthDef = Synthesis Definition\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+In order to synthesise and process sounds in SuperCollider you have to write a recipe for the UGen network in program code. This recipe is formally written using a particular language construct, the SynthDef. \
+\
+\cf2 SynthDef\cf0 (\cf3 \\sine\cf0 , \{\cf2 Out\cf0 .ar(0,\cf2 SinOsc\cf0 .ar(\cf2 Rand\cf0 (440,880),0,0.1))\}).add; \
+\
+The only differences to the classic \{SinOsc.ar(440,0,0.1)\}.play example are:\
+-- the SynthDef wrapper \cf2 SynthDef\cf0 (\cf3 \\nameofsynthdef\cf0 , \{ ...someUGens... \}).add\
+--use of the \cf2 Out\cf0  UGen. The full explanation of the Out UGen is deferred until we discuss busses, but you can think of it for now as saying 'play on the first audio output of the computer'. \
+--\cf4 Rand\cf5 (440,880)\cf0  instead of a fixed constant frequency; this is to make things more interesting when we reuse the SynthDef for creating Synths.\
+\
+Once a recipe is known to the system, you can create an individual Synth object to that specification: \
+\
+\cf2 Synth\cf0 (\cf3 \\sine\cf0 ); \
+\
+In fact, it can be used as many times over as you desire (run these lines one at a time):\
+\
+a=\cf2 Synth\cf0 (\cf3 \\sine\cf0 );  \
+b=\cf2 Synth\cf0 (\cf3 \\sine\cf0 );  \
+c=\cf2 Synth\cf0 (\cf3 \\sine\cf0 ); \
+ \
+And these lines one at a time to individually stop each synth:\
+\
+a.free;\
+b.free;\
+c.free;\
+\
+Note how each of the Synths got initialised to a random frequency from 440 to 880 when created; this is due to the Rand UGen in the SynthDef above.\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+You may see some variations in the way the SynthDef is made and used:\
+\
+\cf2 SynthDef\cf0 (\cf6 "aaa"\cf0 ,\{\cf2 Out\cf0 .ar(0,\cf2 SinOsc\cf0 .ar(440,0,0.1))\}).add\
+\
+\cf2 Synth\cf0 (\cf6 "aaa"\cf0 ); \cf7 //now this\cf0 \
+\
+\\aaa is the same as "aaa" for the purposes of naming the SynthDef recipe here (\\aaa is a Symbol, one fixed value; "aaa" is a string where you can individually access each character)\
+\
+Note that your SynthDef is sent to the current default Server, and that if no synthesis server is booted, you haven't actually acheived anything. Keep an eye on your Server windows to make sure the Server is booted, and that the\
+ -> default \
+button is green. \
+You can also check things programmatically: \
+\
+\cf2 Server\cf0 .default \cf7 //should return the server, usually localhost or internal; global variable s also typically points to the same \cf0 \
+s.serverRunning \cf7 //check if it is on; should return true\cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+Warnings about using SynthDef \
+\
+Particularly amongst older code (pre SuperCollider 3.4), you may also see variants to 'add', like:\
+send(s)	\
+load(s)	\
+memStore\
+store\
+writeDefFile\
+writeOnce\
+storeOnce\
+Though they can have uses in particular circumstances (such as whether to make a copy of a SynthDef on disk or not for permanent availability), add will be your default way of making sure a SynthDef is known to the synthesizer and the system in general. The only issue with add to bear in mind is that the SynthDef is only known (once added) as long as the server is booted; if you quit the synthesizer, you will have to boot again and then add once more before the SynthDef is again available. \
+\
+There is even a shortcut to create a SynthDef and run a Synth based on it in one step:\
+\cf2 SynthDef\cf0 (\cf3 \\saw\cf0 , \{\cf2 Out\cf0 .ar(0,\cf2 Saw\cf0 .ar(\cf2 Rand\cf0 (440,880),0.1))\}).play(s);\
+This is not recommended except perhaps for debugging, since it undermines the sense of setting up the recipe, then using that recipe multiple times to make actual goodies. If you want quick prototyping, \{\}.play is usually the quickest way; but you should eventually package reusable recipes up with SynthDef, and then invoke Synths to use that definition. \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+To explain one reason for the existence of these variations, if you look in the synthdefs folder in the SuperCollider application directory, you'll see various files that each represent individual SynthDefs. These are automatically loaded up when you start the synthesis server (e.g., via that Boot button, or via s.boot). \
+\
+.add - just sends the SynthDef to the synthesis server at this moment, doesn't place any file on disk\
+\
+.writeDefFile - just writes the SynthDef into a file on disk, doesn't load it to the synthesis server. \
+\
+.store - writes the file on disk, so it's loaded every time you start the synthesis server from now on, and also sends it immediately so it's available right away. \
+ \
+So for permanent existence on disk, use .store; but there are often ways round this by using add at an initialisation stage before running a particular composition.  Otherwise you may find you're cluttering up your disk unnecessarily. \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+Let's now have a look at adding arguments to a SynthDef: \
+\
+\cf2 SynthDef\cf0 (\cf3 \\sine\cf0 ,\{\cf2 arg\cf0  freq=440, amp=0.1; \cf2 Out\cf0 .ar(0,\cf2 SinOsc\cf0 .ar(freq,0,amp))\}).add; \cf7 //added frequency and amp arguments to recipe; make sure they have default values (e.g. freq=440)\cf0 \
+\
+\cf2 Synth\cf0 (\cf6 "sine"\cf0 ); \cf7 //now this accepts the defaults\cf0 \
+\
+\cf2 Synth\cf0 (\cf6 "sine"\cf0 ,[\cf3 \\freq\cf0 ,880]); \cf7 //this makes another Synth from the recipe an octave up, by being explicit about the frequency argument to the SynthDef\cf0 \
+\
+You can see how this allows us to make lots of related Synths from a common recipe with slight variations in sound between them. \
+\
+\
+a=\cf2 Synth\cf0 (\cf3 \\sine\cf0 );  \
+b=\cf2 Synth\cf0 (\cf3 \\sine\cf0 ,[\cf3 \\freq\cf0 ,550]);  \
+c=\cf2 Synth\cf0 (\cf3 \\sine\cf0 ,[\cf3 \\freq\cf0 ,660, \cf3 \\amp\cf0 , 0.5]); \
+\
+We can continue to set the named inputs when we feel like it: \
+\
+c.set(\cf3 \\freq\cf0 , 1000);\
+b.set(\cf3 \\amp\cf0 , 0.3, \cf3 \\freq\cf0 , 100)\
+\
+\
+And can use these lines one at a time to individually stop each synth:\
+\
+a.free;\
+b.free;\
+c.free;\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+Exercise:\
+\
+Try taking a simple synthesis patch you've been working on and turn it into a SynthDef. \
+\
+As a prototype you want something like:\
+\
+(\
+\cf2 SynthDef\cf0 (\cf3 \\synthdefname\cf0 ,\{\cf2 arg\cf0  input1= defaultvalue; \cf7 //any arguments go here, make sure they have default values\cf0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf7 //some code for UGens - the sort of thing that went inside \{\}.play before\cf0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 Out\cf0 .ar(0, finaloutput) \cf7 //finaloutput is the final result UGen you want to hear\cf0 \
+\}).add\
+)\
+\
+\
+\
+\cf2 Synth\cf0 (\cf3 \\synthdefname\cf0 , [\cf3 \\input1\cf0 , inputval1]); \cf7 //inputval1 is the constant starting value for argument input1\cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+One common query: recovering SynthDefs and SynthDesc\
+\
+People often ask if the SynthDef code can be recovered from the synthdef file on disk, or the data over on the server. This is not possible, except for limited circumstances, where you want the code for a SynthDef you added earlier in the session (of course, in that case, you've probably got the code lying around already anyhow).\
+\
+In parallel to sending data over to the server, the add message for SynthDef will also store some meta-data, as a SynthDesc inside the SynthDescLib which is a language-side construction (it's not over on the synthesis server but here in SuperCollider's main program). The SynthDesc is particularly critical to the Patterns library, which is one extension set you can explore later in the course. \
+\
+\cf5 \
+\
+\cf4 SynthDescLib\cf5 .global.synthDescs[\cf8 \\sine\cf5 ].def.func.postcs \cf9 //post code used to make SynthDef for \\sine (assumes you added the \\sine SynthDef above)\cf5 \
+\
+\
+\cf4 SynthDescLib\cf5 .global.browse; \cf9 // browse the properties of available SynthDescs in the system\cf5 \
+\
+\
+\cf9 //iterate through all available, posting any known function code\cf5 \
+(\
+\cf4 SynthDescLib\cf5 .global.synthDescs.do \{ \cf4 |desc|\cf5 \
+	if(desc.def.notNil) \{\
+		\cf10 "\\nSynthDef %\\n"\cf5 .postf(desc.name.asCompileString);\
+		desc.def.func.postcs;\
+	\};\
+\};\
+\pard\pardeftab720\ql\qnatural
+\cf5 )\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf5 \
+\
+\
+\
+\
+\cf0 \
+\
+\
+}

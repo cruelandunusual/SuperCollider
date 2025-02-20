@@ -1,0 +1,546 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
+{\fonttbl\f0\fnil\fcharset0 Monaco;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue191;\red191\green0\blue0;\red0\green115\blue0;
+\red0\green0\blue255;\red96\green96\blue96;\red0\green112\blue0;\red0\green0\blue191;\red0\green0\blue0;
+}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\fs36 \cf0 Interaction via MIDI, SoundIn, external controllers\
+\
+(\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 Server\cf0 .default=s=\cf2 Server\cf0 .local;\
+s.boot;\
+)\cf3 \
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 MIDI\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 To access your MIDI devices you first initialise:\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 MIDIClient\cf0 .init	\cf3 //should post a list of available devices\cf0 \
+\
+There may be more than one source and destination device, each containing different input and output ports.  \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 To react to incoming MIDI messages, the user sets up callback functions.\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 MIDIIn\cf0 .connect(0,\cf2 MIDIClient\cf0 .sources[0])  \cf3 //first number is port number, second is device from sources list\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //MIDIIn.connect //would work on its own but defaults to first port of first device\cf0 \
+\cf3 //MIDIIn.connectAll //connect to all attached input sources\cf0 \
+\
+Incoming MIDI messages can be easily handled through some callback functions in MIDIIn. However, from SuperCollider 3.5, the use of MIDIFunc is much preferred. \
+\
+First, the old way: \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 MIDIIn\cf0 .noteOn= \{ \cf2 arg\cf0  src, chan, num, vel;   [chan,num,vel / 127].postln; \};   \cf3 //set up callback for MIDI Note On message\cf0 \
+\
+MIDI messages typically have a 7-bit (2**7) value range, so take on integers from 0 to 127. The vel/127 above converts from this range to a 0.0 to 1.0 range befitting an amplitude control. \
+\
+\cf2 MIDIIn\cf0 .control = \{ \cf2 arg\cf0  src, chan, num, val;   [chan,num,val/127].postln; \}; \cf3 //control change messages have a 7 bit value\cf0 \
+\
+\cf2 MIDIIn\cf0 .bend = \{ \cf2 arg\cf0  src, chan, bend;    [chan,bend/8192].postln; \}; \cf3 //pitch bend has a 14 bit range and is a bipolar signal (so bend/8192 will remap the range to -1.0 to 1.0)\cf0 \
+\
+See the MIDIIn help file for further message types. \
+[\cf2 MIDIIn\cf0 ]\
+\
+\
+\
+\
+\
+\
+\
+\
+Examples: \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //creating Synths with each new note on\cf0 \
+(\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 SynthDef\cf0 (\cf4 \\sound\cf0 ,\{\cf2 arg\cf0  freq=440, amp=0.1;\
+	\cf2 var\cf0  saw, filter, env; \
+	\
+	saw= \cf2 Saw\cf0 .ar(freq);\
+	filter= \cf2 Resonz\cf0 .ar(saw,1000,0.1)*amp;\
+	env= \cf2 EnvGen\cf0 .ar(\cf2 Env\cf0 ([0,1,0],[0.01,0.1]),doneAction:2);\
+	\
+	\cf3 //dup(2) duplicates the mono signal onto two channels, giving instant stereo middle panned output\cf0 \
+	\cf2 Out\cf0 .ar(0,(filter*env).dup(2))\
+\}).add\
+)\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //create one Synth for every new note, Synths will be of finite duration because of the envelope \cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 MIDIIn\cf0 .noteOn = \{ \cf2 arg\cf0  src,chan, midinote, velocity;   \cf2 Synth\cf0 (\cf4 \\sound\cf0 ,[\cf4 \\freq\cf0 ,midinote.midicps,\cf4 \\amp\cf0 ,velocity/127.0]) \};\
+	\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //turn off again	\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 MIDIIn\cf0 .noteOn = \cf2 nil\cf0 ; \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+Keeping track of active (held-down, sustained) notes can be a chore in MIDI. Here is an example of doing this using an array with 128 slots, one for each possible MIDI note. \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //note the use of a gate; this will sustain until released\cf0 \
+(\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 SynthDef\cf0 (\cf4 \\sound\cf0 ,\{\cf2 arg\cf0  freq=440, amp=0.1, gate=1;\
+	\cf2 var\cf0  saw, filter, env; \
+	\
+	saw= \cf2 Saw\cf0 .ar(freq);\
+	filter= \cf2 Resonz\cf0 .ar(saw,1000,0.1)*amp;\
+	env= \cf2 EnvGen\cf0 .ar(\cf2 Env\cf0 .asr(0.005,1.0,0.1),gate,doneAction:2);\
+	\
+	\cf2 Out\cf0 .ar(0,(filter*env).dup(2))\
+\}).add\
+)\
+\
+(\
+\cf2 var\cf0  activenotes = \cf2 nil\cf0 !128; \cf3 //make Array of 128 slots, initially with nil objects in to represent nothing\cf0 \
+\cf2 var\cf0  releasefunction = \{\cf2 |index|\cf0  \
+	\
+		\cf3 //release existing note if present already\cf0 \
+	if(activenotes[index].notNil) \{\
+		activenotes[index].release; \cf3 //will send gate=0\cf0 \
+		activenotes[index] = \cf2 nil\cf0 ; \cf3 //make sure now empty slot ready\cf0 \
+	\}\
+		\
+	\}; \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //create one Synth for every new note, with logic to check existing notes (though not MIDI channel sensitive)\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 MIDIIn\cf0 .noteOn = \{ \cf2 arg\cf0  src,chan, midinote, velocity;   \
+	\
+	"received".postln;\
+	\
+	releasefunction.value(midinote);\
+	\
+	\cf3 //put active note in array; function above tidied any existing note on this key\cf0 \
+	activenotes[midinote] = \cf2 Synth\cf0 (\cf4 \\sound\cf0 ,[\cf4 \\freq\cf0 ,midinote.midicps,\cf4 \\amp\cf0 ,velocity/127.0]);\
+	\
+	\};\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //must also look for note offs as indicated end of held note\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 MIDIIn\cf0 .noteOff = \{ \cf2 arg\cf0  src,chan, midinote, velocity;   \
+	\
+	releasefunction.value(midinote);\
+\
+	\};\
+\
+)	\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //using control change for continuous variation; run one block/line at a time here\cf0 \
+\cf3 //no envelope this time, permanent sound\cf0 \
+(\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 SynthDef\cf0 (\cf4 \\sound\cf0 ,\{\cf2 arg\cf0  freq=440, amp=0.1;\
+\cf2 var\cf0  saw, filter, env; \
+\
+saw= \cf2 Saw\cf0 .ar(freq);\
+\
+filter= \cf2 Resonz\cf0 .ar(saw,1000,0.1)*amp;\
+\
+\cf2 Out\cf0 .ar(0,filter.dup(2))\
+\}).add\
+)\
+\
+a= \cf2 Synth\cf0 (\cf4 \\sound\cf0 ,[\cf4 \\freq\cf0 ,77,\cf4 \\amp\cf0 ,0.9]); \cf3 //create running synth\cf0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //use the set message to update the control inputs of the running synth\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 MIDIIn\cf0 .control = \{ \cf2 arg\cf0  src, chan, num, val;   a.set(\cf4 \\amp\cf0 , val/127) \};\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //when you're finished twiddling MIDI controllers\cf0 \
+a.free;\
+\
+\
+\
+\
+\
+\
+\
+For sending MIDI messages out see the MIDIOut help file\
+[\cf2 MIDIOut\cf0 ]\
+\
+WARNING: by default there is a long latency to messages sent out, to allow it to match with other default latencies in the system. \
+\
+\pard\pardeftab560\ql\qnatural
+\cf0 m= \cf2 MIDIOut\cf0 (0); \cf3 //quick way to access device 0, port 0\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 m.latency= 0.0;  \cf3 //use this to remove all latency and send messages immediately\cf0 \
+m.noteOn(1,60,127);     \cf3 //arguments: channel, note, velocity\cf0 \
+m.noteOff(1,60,0);\
+\
+There are also some helper classes to allow you to more easily set up multiple independent callbacks for the same type of message:\
+\
+[MIDIFunc]\
+[MIDIdef]\
+\
+\
+To make a callback for when receiving note on messages:\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 MIDIIn\cf0 .connect(0,\cf2 MIDIClient\cf0 .sources[1])  \cf3 //second source device \cf0 \
+\
+(\
+b = \cf2 MIDIFunc\cf0 .noteOn(\{ \cf5 |velocity, midipitch, channel|\cf0 \
+\'a0 \'a0 \
+	[\cf4 \\velocity\cf0 ,velocity, \cf4 \\midinote\cf0 ,midipitch, \cf4 \\channel\cf0 , channel].postln;\
+\
+\});\
+)\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //make a separate callback, also for MIDI note on triggers\cf0 \
+\
+(\
+c = \cf2 MIDIFunc\cf0 .noteOn(\{ \cf5 |velocity, midipitch, channel|\cf0 \
+\'a0 \'a0 \
+	\cf6 "note on!"\cf0 .postln;\
+\
+\});\
+)\
+\
+\cf3 //remove first callback and keep second \cf0 \
+\
+b.free; \
+\
+\cf3 //see the [Using MIDI] helpfile for more information\cf0 \
+\
+c.free; \cf3 //remove second\cf0 \
+\
+\cf3 //note that by default, cmd+period will remove any MIDIFuncs that haven't been made permanent\cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+SoundIn\
+\cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 To obtain an audio input stream, use the simple SoundIn UGen\
+\
+\{ \cf2 SoundIn\cf0 .ar([0,1],0.1) \}.play;	      \cf3 // stereo through patching from 2 inputs to output\
+\
+\cf0 \{ \cf2 SoundIn\cf0 .ar(1,0.1) \}.play;	      \cf3 // mono on input channel 1; won't work if you don't have at least 2 inputs!\
+\
+\
+\cf0 So it's easy to build effects processors for live audio:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 (\
+\{ \cf3 //ring modulator\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 SinOsc\cf0 .ar(\cf2 MouseX\cf0 .kr(0.001,110,\cf7 'exponential'\cf0  ))*\cf2 SoundIn\cf0 .ar(0,0.5) \
+\}.play;	      \cf3 // stereo through patching from input to output\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 )\cf3 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\cf0 SuperCollider comes with an amplitude tracker and pitch tracker for realtime audio \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 (\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 // use input amplitude to control Pulse amplitude - use headphones to prevent feedback.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \{\
+	\cf2 Pulse\cf0 .ar(90, 0.3, \cf2 Amplitude\cf0 .kr(\cf2 SoundIn\cf0 .ar(0)))\
+\}.play\
+)\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 You can threshold the input to avoid picking up background noise\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 (\
+\{\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 var\cf0  input,inputAmp,threshhold,gate;\
+\cf2 var\cf0  basefreq;\
+\
+input = \cf2 SoundIn\cf0 .ar(0,0.1); \
+inputAmp = \cf2 Amplitude\cf0 .kr(input);\
+threshhold = 0.02;	\cf3 // noise gating threshold\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 gate = \cf2 Lag\cf0 .kr(inputAmp > threshhold, 0.01);\
+(input * gate)		\
+\}.play;\
+)\cf3 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\cf0 The Pitch follower has many input arguments, though you usually take the defaults\
+without worrying. It returns two outputs- the tracked frequency and a signal indicating\
+whether it has locked onto any periodicity or not\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 Server\cf0 .internal.boot; \cf3 //if on a Mac you'll need to swap back to internal server for using .scope- you can have both the internal and localhost server on at once, but you might need to press the -> default button\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+//showing the outputs - K2A makes sure control rate signals are converted to audio rate, because the final output of a Synth has to be audio rate\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 (\
+\{\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 var\cf0  freq, hasFreq;\
+# freq, hasFreq = \cf2 Pitch\cf0 .kr(\cf2 SoundIn\cf0 .ar(1,0.1));\
+[\cf2 K2A\cf0 .ar(freq*0.001), \cf2 K2A\cf0 .ar(hasFreq)]\
+\}.scope\
+)\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //detected fundamental frequency used to control some oscillators with allpass reverberation\
+//Amplitude detector also used to make the control track the input more effectively\cf0 \
+(\
+\{\
+	\cf2 var\cf0  in, amp, freq, hasFreq, out;\
+	in = \cf2 Mix\cf0 .ar(\cf2 SoundIn\cf0 .ar([0,1]));\
+	amp = \cf2 Amplitude\cf0 .kr(in, mul: 0.4);\
+	# freq, hasFreq = \cf2 Pitch\cf0 .kr(in);\
+	out = \cf2 Mix\cf0 .ar( \cf2 LFTri\cf0 .ar(freq * [0.5, 1, 2]) ) * amp;\
+	6.do(\{ \
+		out = \cf2 AllpassN\cf0 .ar(out, 0.040, [0.040.rand,0.040.rand], 2) \
+	\});\
+	out\
+\}.play\
+)\
+\cf3 \
+\
+\
+\
+\
+\
+//Also switch waveform based on hasFreq output\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 (\
+\{\
+	\cf2 var\cf0  in, amp, freq, hasFreq, out;\
+	\
+	in = \cf2 SoundIn\cf0 .ar(1);\
+	amp = \cf2 Amplitude\cf0 .kr(in, mul: 0.4);\
+	# freq, hasFreq = \cf2 Pitch\cf0 .kr(in);\
+	\
+	out=if(hasFreq,\cf2 Pulse\cf0 .ar(freq,0.5,0.1),\cf2 SinOsc\cf0 .ar(freq,0,0.1));\
+	\
+	6.do(\{ \
+		out = \cf2 AllpassN\cf0 .ar(out, 0.040, [0.040.rand,0.040.rand], 2) \
+	\});\
+	out	\
+\}.play\
+)\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 There are various other machine listening capabilities in SuperCollider.  Machine listening is getting the computer to extract perceptually and musically meaingful attributes by analyzing an input sound.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 Here are some onset detectors which might be helpful: \
+\
+[\cf2 Onsets\cf0 ]\
+[\cf2 PV_HainsworthFoote\cf0 ]\
+[\cf2 PV_JensenAndersen\cf0 ]\
+\
+They rely on using the FFT UGen in the front end to go from time domain to frequency domain. You can trust the code examples for now and we'll investigate FFT properly later on (or explore the help file yourself).  \
+\
+Example triggering TGrains UGen:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //run this first\cf0 \
+b = \cf2 Buffer\cf0 .read(s,\cf8 Platform\cf9 .resourceDir +/+\cf6 "sounds/a11wlk01.wav"\cf0 );\
+\
+\cf3 //now this\cf0 \
+(\
+\{\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 var\cf0  source, detect;\
+	\
+	source= \cf2 SoundIn\cf0 .ar(0); \
+	\
+	detect= \cf2 Onsets\cf0 .kr(\cf2 FFT\cf0 (\cf2 LocalBuf\cf0 (2048),source),0.1); \cf3 //second argument is detection threshold\cf0 \
+	\cf3 //detect= PV_HainsworthFoote.ar(FFT(LocalBuf(2048),source), 1.0, 0.0, 0.7, 0.01);\cf0 \
+	\
+	\cf2 TGrains\cf0 .ar(2, detect, b, \cf2 LFNoise0\cf0 .kr(10,0.2,1.0), \cf2 MouseX\cf0 .kr(0,\cf2 BufDur\cf0 .kr(b)), \cf2 MouseY\cf0 .kr(0.1,0.5), \cf2 LFNoise0\cf0 .kr(10,1.0), 0.5, 2);\
+\}.play\
+)\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+RecordBuf\
+\
+If you'd like to capture live sound, the RecordBuf UGen is your friend.\
+You need to set up a buffer to store the recorded sample data.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 (\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 var\cf0  b;\
+\
+b=\cf2 Buffer\cf0 .alloc(s,44100,1);	\cf3 //1 second mono buffer allocated on local server\cf0 \
+\
+\{\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 //continuously record in a loop, recording to the buffer we just declared\cf0 \
+\cf3 //each record cycle multiplies the old data \cf0 \
+	\cf2 RecordBuf\cf0 .ar(\cf2 SoundIn\cf0 .ar(0), b, 0, 1.0, \cf2 MouseX\cf0 .kr(0.0,1.0), 1, 1, 1);\
+	\
+\cf3 //playback the captured buffer in a loop, backwards\cf0 \
+	\cf2 PlayBuf\cf0 .ar(1,b,\cf2 MouseY\cf0 .kr(0.0,-1.0), 1,0,1);\
+\}.play;\
+)\
+\
+You might sync captured buffers to tempo for dance music, and add refinements like a user interface to choose when to rerecord the buffer...\
+\cf3 \
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 There are also facilities for control from graphics tablets and joysticks:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 [\cf2 \ul \ulc2 SC2DTabletSlider\cf0 \ulnone ]\
+[\cf2 \ul HIDDeviceService\cf0 \ulnone ]\
+[{\field{\*\fldinst{HYPERLINK "SC://GeneralHID"}}{\fldrslt \cf2 GeneralHID}}]\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 \
+\cf0 You might also like to try\
+\
+[{\field{\*\fldinst{HYPERLINK "SC://SerialPort"}}{\fldrslt \cf2 SerialPort}}]		\cf3 //serial port (via USB usually these days) for talking to certain external devices\cf0 \
+\
+Another standard way is to communicate with other applications using Open Sound Control, a network music protocol; we'll cover this in a later week in this course. \cf3 \
+\
+\
+\
+\
+}

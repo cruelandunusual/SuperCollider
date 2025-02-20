@@ -1,0 +1,468 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf350
+{\fonttbl\f0\fnil\fcharset0 Monaco;}
+{\colortbl;\red255\green255\blue255;\red0\green115\blue0;\red0\green0\blue191;\red0\green0\blue0;
+\red0\green0\blue191;\red0\green115\blue0;\red191\green0\blue0;\red191\green0\blue0;\red96\green96\blue96;
+}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\fs36 \cf2 Sequencing events in SuperCollider \cf0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+There are various mechanisms in SuperCollider to cause events to play over time. Popularly known as sequencing, this is also called scheduling in the computer music literature. In computer science speak, an event might be scheduled for a certain future occurrence time; the scheduler takes care of makng this happen. \
+\
+At this stage, we'll learn some code mechanisms that get us going quickly with placing events in time (more technical detail can be discussed later in the course). We've already learnt two essential adjuncts to doing this; using envelope and doneAction:2 to create time-limited self-deallocating Synths, and packaging reusable synthesis code as a SynthDef so multiple Synths can be made from one recipe. \
+\
+In a separate file, we'll explore a few mechanisms to do scheduling on the server alone, but here we'll look at sequencing Synths from the language. \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+Let's start with a SynthDef we can use for our experiments: \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 (\cf4   \
+\cf5 SynthDef\cf4 (\cf6 \\event\cf4 ,\{ \cf5 arg\cf4  freq=440, amp=0.5, pan=0.0;  \
+	\cf5 var\cf4  env; \
+	 \
+	env = \cf5 EnvGen\cf4 .ar(  \cf5 Env\cf4 ([0,1,1,0],[0.01, 0.1, 0.2]),  doneAction:2);  \
+	\
+	\cf5 Out\cf4 .ar(0,  \cf5 Pan2\cf4 .ar(\cf5 Blip\cf4 .ar(freq) * env * amp, pan))  \
+\}).add;  \
+\cf0 )\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 \
+\cf7 //test event sound\cf4 \
+\cf5 Synth\cf4 (\cf6 \\event\cf4 )	\cf7 //accepts defaults. Event shouldn't hang around once envelope finished due to doneAction:2\cf0 \
+\
+\cf4 \
+\cf7 //specifying values\cf4 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf5 Synth\cf4 (\cf6 \\event\cf4 ,[\cf6 \\freq\cf4 ,880,\cf6 \\amp\cf4 ,0.2,\cf6 \\pan\cf4 ,1.0]) \cf7 //pan 1.0 should send to right ear\cf4 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\cf4 \
+\cf7 //let's go straight to seeing some code to schedule/sequence 2 events, evenly spaced: \cf4 \
+\
+(\
+\{\
+	\
+	\cf5 Synth\cf4 (\cf6 \\event\cf4 ); \
+	\
+	1.0.wait;	\cf7 //wait for 1 time unit of default tempo, will probably work out to 1 second\cf4 \
+	\
+	\cf5 Synth\cf4 (\cf6 \\event\cf4 ); \
+	\
+\}.fork; 	\cf7 //.fork is a computer science term for setting a new process (sequence) in action\cf4 \
+)\
+\
+\cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\cf7 //now 4 events, all evenly spaced\cf4 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 (\
+\{\
+	\
+	\cf5 Synth\cf4 (\cf6 \\event\cf4 ); \
+	1.0.wait;	\
+	\cf5 Synth\cf4 (\cf6 \\event\cf4 ); \
+	1.0.wait;	\
+	\cf5 Synth\cf4 (\cf6 \\event\cf4 ); \
+	1.0.wait;	\
+	\cf5 Synth\cf4 (\cf6 \\event\cf4 ); \
+	\
+\}.fork; 	\
+)\cf0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 \
+\cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf8 //which could be more concisely written using encapsulation: \cf0 \
+(\
+\{\
+	\
+	4.do \{\
+		\cf3 Synth\cf0 (\cf2 \\event\cf0 ); \
+		1.0.wait;	\
+	\};\
+	\
+\}.fork; 	\
+)\
+\
+\
+If the 4.do is confusing, let's try it in isolation to do something 4 times over: \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 \
+4.do \{\cf9 "hello"\cf4 .postln\}; \cf7 //run; what do you see in your post window? \cf0 \
+\
+btw, the function that is done is passed an argument, which tells it how many times it was called already: \
+\cf4 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 4.do \{\cf5 arg\cf4  repeatnumber; repeatnumber.postln; \cf9 "iteration complete"\cf4 .postln;\}; \cf7 //run; what do you see in your post window? \cf4 \
+\cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 Such an argument can come in very handy for programmatically changing parameters over time based on where you are along in a sequence of iterations. \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf8 //now 8 events, all evenly spaced, but with a random frequency each time\cf0 \
+(\cf4 \
+\{\
+	\
+	8.do \{\
+		\cf8 //rrand(low, hi) gets a uniform random number in that range\cf4 \
+		\cf5 Synth\cf4 (\cf6 \\event\cf4 ,[\cf6 \\freq\cf4 , rrand(440,880)]); \
+		1.0.wait;	\
+	\};\
+	\
+\}.fork; 	\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 )\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf8 //now 8 events, unevenly spaced\cf0 \
+(\
+\{\
+	\
+	8.do \{\
+		\cf3 Synth\cf0 (\cf2 \\event,[\\freq\cf0 , rrand(440,880)\cf2 ]\cf0 ); \
+		rrand(0.2,0.6).wait;	\
+	\};\
+	\
+\}.fork; 	\
+)\
+\
+\
+\
+\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 \
+\cf7 //now 8 events, unevenly spaced, followed by 4 quick evenly spaced events\cf4 \
+(\
+\{\
+	\
+	8.do \{\
+		\cf5 Synth\cf4 (\cf6 \\event\cf4 ,[\cf6 \\freq\cf4 , rrand(110,220)]); \
+		rrand(0.2,0.6).wait;	\
+	\};\
+	\
+	4.do \{\
+		\cf5 Synth\cf4 (\cf6 \\event\cf4 ); \
+		0.25.wait;	\
+	\};\
+	\
+\}.fork; 	\
+)\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+\
+\
+\
+\
+\
+Got the idea yet? \
+\
+Write your list of instructions of code to schedule, down the page. The scheduler will deal with calling them in order with the correct time gaps. \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+In many cases you'd prefer to work relative to some tempo, for instance, if you want to schedule events in terms of beats and measures.\
+\
+SuperCollider measures tempi in beats per second (bps) rather than beats per minute, i.e\
+\
+1 bps = 60 bpm\
+\
+1.6666667 bps = 100 bpm\
+\
+2 bps = 120 bpm\
+\
+2.4 bps = 144 bpm\
+\
+3 bps = 180 bpm\
+\
+\
+\
+(multiply by 60 to go from bps to bpm, divide by 60 in the other direction)\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+For sequencing, you can change the clock with respect to which the timings are worked out. There is a default (which was being used above) \
+\cf4 \
+\cf5 TempoClock\cf4 .default \cf7 //default clock\cf4 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf5 TempoClock\cf4 .default.tempo \cf7 //get tempo in beats per second. \cf4 \
+\
+Note that 1 bps means 1 beat = 1 second, so the wait timings above are in seconds if 1 bps\
+\
+\cf5 TempoClock\cf4 .default.tempo  = 2 //set tempo, now 2 beats per second, e.g. 120 beats per minute\cf0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+You can also make your own clock: \
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 (\cf4 \
+\cf5 var\cf4  tempoclock = \cf5 TempoClock\cf4 (3);  \cf7 //3 beats per second\cf4 \
+\{\
+	\
+	8.do \{\
+		\cf7 //rrand(low, hi) gets a uniform random number in that range\cf4 \
+		\cf5 Synth\cf4 (\cf6 \\event\cf4 ,[\cf6 \\freq\cf4 , rrand(440,880)]); \
+		1.0.wait;	\
+	\};\
+	\
+\}.fork(tempoclock); \cf7 //make sure the fork knows to use this clock rather than the default 	\cf4 \
+\cf0 )\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+You can make things repeat forever by using the special keyword inf (infinity). But be very careful there is a wait time in the loop; otherwise your computer will try to do an infinite number of things as fast as possible, which tends to lock up your machine. \
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 (\
+\cf3 var\cf0  tempoclock = \cf3 TempoClock\cf0 (1);  \cf8 //1 beat per second\cf0 \
+\{\
+	\
+	//inf.do does something forever. Make very sure that there is a .wait of some duration inside the loop!\
+	inf.do \{\
+		\cf3 Synth\cf0 (\cf2 \\event\cf0 ,[\cf2 \\freq\cf0 , rrand(440,880)]); \
+		1.0.wait;	\
+	\};\
+	\
+\}.fork(tempoclock); \
+)\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+This sequence will keep going until you press cmd+period to stop it. You could also have written \
+\
+a = \{  ...somestuff... \}.fork\
+\
+and later called: \
+\
+a.stop\
+\
+which shows the importance of keeping a handle on active processes; variable a is used to store the forked process here. \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+Exercises: \
+\
+1) Create an isochronous (evenly spaced) sequence of 16 events, separated by waiting 0.25 time units\
+\
+\
+2) At 126 bpm create four events separated by beats (a four to the floor, so to speak) followed by 16 events separated by 0.25 beat gaps. The four inital events should all be a middle C (hint: try 60.midicps). The 16 faster paced events should go up in frequency over their course. Remember that 'do' is passed the iteration count as an argument.  \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+Further mechanisms for sequencing \
+\
+There are many other ways to schedule events in SuperCollider.\
+\
+Basics of server-side sequencing is covered next, in another file. \
+\
+There is a library called Patterns that comes with SC that provides its own ways to explore the notion of algorithmically placing events in time. We'll look more at this later. \
+\
+You can explicitly schedule things in the future using functionality provided by clocks. For example, using the actual computer system clock: \
+ \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 (\cf4 \
+\cf5 SystemClock\cf4 .sched(1.0,\cf7 //start at 1.0 second from now\cf4 \
+	\{\cf7 //a function which states what you wish to schedule\cf4 \
+		\cf5 Synth\cf4 (\cf6 \\event\cf4 );\
+		\
+		\cf5 nil\cf4  \cf7 //return nil to do just once\cf4 \
+		\cf7 //1		//return 1 to repeat every second\cf4 \
+	\}\
+)\
+\cf0 )\
+\
+\
+The \{\}.fork construction here is a fast way to get going (and is a wrapper for some other code we may discuss later; but you can just use it without worrying for now). We haven't solved the full problems of having hierarchical time structures like bars/measures here. 3.5 explores nested scheduling, where one sequence causes other sequences to be triggered; this is like having a higher level time unit, such as a measure, within which inner events are scheduled on their own independent sequences. \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+}
