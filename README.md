@@ -6,3 +6,6 @@ https://youtube.com/playlist?list=PLPYzvS8A_rTaNDweXe6PX4CXSGq4iEWYC&si=QhLcBw_y
 although there are some digressions in the code to the built in tutorials in the SuperCollider help files.
 
 The Creative Musician folder contains both my own code from following Fieldsteel's book, and the book's sample code.
+
+The sctutorial folder contains the html source and my own .scd files from following Nick Collins' SuperCollider tutorials
+(https://composerprogrammer.com/teaching/supercollider/sctutorial/tutorial.html)
