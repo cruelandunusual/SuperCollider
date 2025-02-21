@@ -36,9 +36,9 @@ This is also termed a source+filter model.
 {LPF.ar(WhiteNoise.ar(mul:0.1), freq:2000, mul:1.0)!2}.scope;
 // the freq value is the filter cutoff
 
-// if we want to vary the filter cutoff we can use a Line generator UGen
+// if we want to vary the filter cutoff we can use an XLine generator UGen
 // plugged in to the freq argument slot
-{Line.ar(start:5000, end:1, dur:1, mul:0.002, doneAction:0)}.scope; // mul:0.002 to get rid of the loud click
+{XLine.ar(start:5000, end:1, dur:1, mul:0.002, doneAction:0)}.scope; // mul:0.002 to get rid of the loud click
 // the code above shows the frequency of the line filter
 
 // but note we're using the kr method of the Line generator,
@@ -57,14 +57,15 @@ This is also termed a source+filter model.
 
 
 // Another example of plugging a sound source (LFNoise0) into a filter (Resonz), with XLine to change the filter frequency
+(
 {
 	Resonz.ar(
-		in: LFNoise0.ar(freq:400),
+		in: LFNoise0.ar(freq:400, mul:1.0),//(freq:400),
 		freq: XLine.kr(start:10000.0, end:1000.0, dur:10.0),
-		bwr:0.1).dup(2);
+		bwr:0.2).dup(2);
 
 }.scope;
-
+)
 
 /*
 There are lots of possible sources and lots of possible filters
@@ -86,6 +87,8 @@ Resonz
 
 
 // This is more readable with local variables holding object references as we build the patch
+// Also, for revision purposes I set a variable (f) to hold the function definition and created
+// another variable (g) to play the function definition
 (
 f = {
 	 |filtStart = 100.0, filtEnd = 10000.0, filtDur = 5.0| // somehow this arg syntax seems to allow overriding
@@ -99,7 +102,8 @@ f = {
 
 	soundSource = LFNoise0.ar(freq:400, mul:0.2);
 	filterFreq = XLine.kr(start:filtStart, end:filtEnd, dur:filtDur);
-	filter = HPF.ar(in:soundSource, freq:filterFreq); // bwr = Bandwidth ratio (reciprocal of Q). rq = bandwidth / centerFreq.
+	filter = Resonz
+	.ar(in:soundSource, freq:filterFreq); // bwr = Bandwidth ratio (reciprocal of Q). rq = bandwidth / centerFreq.
 	filter.dup(2);
 };
 )
