@@ -95,10 +95,10 @@ f = {
 	// more easily than declaring arg names as below: ...?
 	//arg filtStart, filtEnd, filtDur;
 	var soundSource, filterFreq, filter;
-	// default values for the filter
-	filtStart;// = 1000.0;
-	filtEnd;// = 10000.0;
-	filtDur;// = 5.0;
+	// default values for the filter (if using arg declarations instead of pipe syntax)
+	//filtStart = 1000.0;
+	//filtEnd = 10000.0;
+	//filtDur = 5.0;
 
 	soundSource = LFNoise0.ar(freq:400, mul:0.2);
 	filterFreq = XLine.kr(start:filtStart, end:filtEnd, dur:filtDur);
@@ -112,3 +112,33 @@ g = f.play(args: [filtStart: 1000.0, filtEnd: 1.0, filtDur: 5.0]); //override de
 g.free;
 
 
+/*********************************
+
+Additive Synthesis
+Rather than starting with something
+complex and taking energy away to
+sculpt a sound, we can start with simple
+building blocks and add many of them
+together to create more involved sounds
+
+**********************************/
+
+// The classic building block in computer music is the sine tone
+{SinOsc.ar}.scope;
+
+// A method of getting two sine tones at once:
+(
+{
+	SinOsc.ar(freq:400, phase:0.0, mul:0.1)
+	+
+	SinOsc.ar(freq:660, phase:0.0, mul:0.1);
+}.scope;
+)
+
+// An even easier way is to hold the frequencies in an array
+// This also sounds better stereo-wise
+(
+{
+	SinOsc.ar(freq:[400,660], phase:0.0, mul:0.1);
+}.scope;
+)
