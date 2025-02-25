@@ -102,13 +102,12 @@ f = {
 
 	soundSource = LFNoise0.ar(freq:400, mul:0.2);
 	filterFreq = XLine.kr(start:filtStart, end:filtEnd, dur:filtDur);
-	filter = Resonz
-	.ar(in:soundSource, freq:filterFreq); // bwr = Bandwidth ratio (reciprocal of Q). rq = bandwidth / centerFreq.
+	filter = Resonz.ar(in:soundSource, freq:filterFreq); // bwr = Bandwidth ratio (reciprocal of Q). rq = bandwidth / centerFreq.
 	filter.dup(2);
 };
 )
 g = f.play;
-g = f.play(args: [filtStart: 1000.0, filtEnd: 1.0, filtDur: 5.0]); //override defaults when calling play
+g = f.play(args: [filtStart:1000.0, filtEnd:1.0, filtDur:5.0]); //override defaults when calling play
 g.free;
 
 
@@ -142,3 +141,62 @@ together to create more involved sounds
 	SinOsc.ar(freq:[400,660], phase:0.0, mul:0.1);
 }.scope;
 )
+
+// To understand what happened to the stereo field in that last example,
+// let's look at a panning UGen
+(
+{
+	Pan2.ar(
+		in:SinOsc.ar(freq:440, mul:0.1),
+		pos:MouseY.kr(minval:-1, maxval:1));
+}.scope;
+)
+
+// The panner takes a mono signal and places it in the stereo field.
+// The Mouse UGen pans signal from left or right depending on y position of the mouse.
+
+// We can also do more than two channels, even if we can only hear the first two:
+{SinOsc.ar(freq:[200, 450, 700], mul:0.1)}.scope;
+
+// To hear more than two channels we can mix the signals
+// down to mono using a Mix UGen
+{Mix(array:SinOsc.ar(freq:[200, 450, 700], mul:0.1))}.scope;
+
+// To hear this as stereo we can wrap it in the Pan2 UGen
+(
+{
+	Pan2.ar(
+		in:Mix(SinOsc.ar(freq:[200, 450, 700], mul:0.1)),
+		pos:MouseY.kr(minval:-1, maxval:1));
+}.scope;
+)
+
+/*
+
+We are now equipped to explore additive synthesis via sine tones.
+In additive synthesis, if we know a recipe for the spectrum
+(frequency content) of a sound, we can synthesise it by adding up
+sine tones for each component frequency.
+
+Recipes for common waveforms are known from the Fourier theory
+of sound (sinusoids at which frequencies and amplitudes add up
+to create certain waveform shapes).
+
+*/
+
+/*
+Sawtooth wave: Add up n harmonics with amplitude falling off
+as 1/harmonicnumber, sign alternates between +1 and -1
+*/
+(
+{
+	var n = 10;
+	var wave = Mix.fill(10,{|i|
+		var mult = ((-1)**i)*(0.5/((i+1)));
+		SinOsc.ar(440*(i+1))*mult;
+	});
+	Pan2.ar(wave/n,0.0); //stereo, panned centre
+}.scope;
+)
+
+{Saw.ar(freq:440, mul:0.1)!2}.scope;
