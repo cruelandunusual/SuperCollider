@@ -192,7 +192,7 @@ as 1/harmonicnumber, sign alternates between +1 and -1
 {
 	var n = 10;
 	var wave = Mix.fill(10,{|i|
-		var mult = ((-1)**i)*(0.5/((i+1)));
+		var mult = ((-1)**i)*(0.5/((i+1))); //amplitude
 		SinOsc.ar(440*(i+1))*mult;
 	});
 	Pan2.ar(wave/n,0.0); //stereo, panned centre
@@ -200,3 +200,37 @@ as 1/harmonicnumber, sign alternates between +1 and -1
 )
 
 {Saw.ar(freq:440, mul:0.1)!2}.scope;
+
+
+/*
+Square wave: Sum of odd harmonics, no even, amplitude
+falls as off 1/harmonicnumber; closest 'real' waveform
+is a clarinet tone
+*/
+(
+{
+	var n = 10;
+	var wave = Mix.fill(10,{|i|
+			var harmonicnumber = 2*i+1; //odd harmonics only
+			SinOsc.ar(440*harmonicnumber)/harmonicnumber
+		})*0.25;
+	Pan2.ar(wave,0.0); //stereo, panned centre
+}.scope;
+)
+
+
+
+
+
+// This is my own attempt at making lots of SinOsc signals; no attempt at
+// doing anything fancy with the harmonics, I mainly wanted to know
+// if the 10 signals created by Mix.fill would all have 10 different frequencies (they do).
+(
+f = {
+	var n = 20;
+	var sig = Mix.fill(n, {SinOsc.ar(freq:rrand(100, 800), mul:0.2/n)});
+	Pan2.ar(sig);
+};
+)
+
+g = f.play;
