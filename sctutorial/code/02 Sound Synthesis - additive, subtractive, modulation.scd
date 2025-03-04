@@ -1,6 +1,6 @@
 /*********************************
 
-Sound Synthesis in SuperCollider: Subtractive and Additive Synthesis
+2.1 Subtractive and Additive Synthesis
 from Nick Collins' SuperCollider tutorials
 [ composerprogrammer.com ]
 
@@ -212,12 +212,12 @@ is a clarinet tone
 	var wave = Mix.fill(10,{|i|
 			var harmonicnumber = 2*i+1; //odd harmonics only
 			SinOsc.ar(440*harmonicnumber)/harmonicnumber
-		})*0.25;
+		})*0.05;
 	Pan2.ar(wave,0.0); //stereo, panned centre
 }.scope;
 )
 
-
+LF
 
 
 
@@ -236,7 +236,7 @@ g = f.play;
 
 /*********************************
 
-Mul and Add (and arguments to UGens)
+2.2 mul and add (and arguments to UGens)
 from Nick Collins' SuperCollider tutorials
 [ composerprogrammer.com ]
 
@@ -263,3 +263,50 @@ fatigue or distress the speaker over long periods of time..." */
 // The mul and add arguments help when you need to set one signal as an input to another
 // and need to scale the input signal appropriately to the expected input values required.
 {SinOsc.ar(mul:MouseX.kr(minval:0.03, maxval:0.2), add:MouseY.kr(minval:0.9, maxval:-0.9))}.scope;
+// In this example, the output signal (default value of 1.0) is being multiplied by the MouseX UGen,
+// with the minimum and maximum values constrained to be much lower than 1.0
+
+
+
+// There is a shortcut for the mul and add inputs given by using the * and + symbols.
+{0.1*SinOsc.ar}.scope;
+// is the same as
+{SinOsc.ar*0.1}.scope;
+// which is the same as
+{SinOsc.ar(mul:0.1)}.scope;
+// And
+{0.1*SinOsc.ar+0.5}.scope;
+// is the same as
+{SinOsc.ar*0.1+0.5}.scope;
+// which are both equivalent to
+{SinOsc.ar(mul:0.1,add:0.5)}.scope;
+
+
+
+// A note on modulation (you may find it useful to reread this later):
+// mul and add are very useful in setting up modulators, sometimes via the * and + versions.
+// The mul input in particular gets used for explicit modulation, that is, multiplying different signals together.
+// Using one SinOsc to modulate the frequency of another:
+(
+{SinOsc.ar(
+	SinOsc.kr( // this can also be the .ar method, but since we're
+		// plugging in a very low frequency it might as well be .kr
+		freq:3, // 3 oscillations per second
+		mul:40,
+		add:440),
+	phase:0,
+	mul:0.1)
+}.scope;
+)
+// The inner SinOsc is the modulator. Three times per second it varies between +-40 (mul scaling).
+// I add 440 to make this output value go between 400 and 480.
+// This is a suitable input varying frequency control for the outer SinOsc.
+
+/*********************************
+
+2.3 Controlling Synths
+from Nick Collins' SuperCollider tutorials
+[ composerprogrammer.com ]
+
+**********************************/
+
