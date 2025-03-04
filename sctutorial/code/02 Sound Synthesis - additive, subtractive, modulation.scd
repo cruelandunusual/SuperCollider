@@ -1,9 +1,8 @@
-
+/*********************************
 
 Sound Synthesis in SuperCollider: Subtractive and Additive Synthesis
 from Nick Collins' SuperCollider tutorials
 [ composerprogrammer.com ]
-
 
 **********************************/
 
@@ -234,3 +233,33 @@ f = {
 )
 
 g = f.play;
+
+/*********************************
+
+Mul and Add (and arguments to UGens)
+from Nick Collins' SuperCollider tutorials
+[ composerprogrammer.com ]
+
+**********************************/
+
+// mul and add are usually the final arguments to UGens.
+// mul scales the amplitude of the signal that's sent to the soundcard.
+// add is a value added to every sample in the output signal.
+
+// In this example the mouseY location multiplies (amplifies) the output.
+{SinOsc.ar(mul:MouseY.kr(minval:0.3, maxval:0.01))!2}.scope;
+
+
+
+// Another thing you can do to signals is offset (translate) them.
+// This example uses the add argument for this.
+{SinOsc.ar(mul:0.1, add:MouseY.kr(minval:0.9, maxval:-0.9))}.scope;
+// This doesn't affect the sound of the output. From Fieldsteel page 41:
+/* "If add is non-zero, the entire waveform vertically shifts... A vertically
+shifted signal may not sound any different to the human ear, but if routed
+through a loudspeaker the speaker cone will vibrate asymetrically, which may
+fatigue or distress the speaker over long periods of time..." */
+
+// The mul and add arguments help when you need to set one signal as an input to another
+// and need to scale the input signal appropriately to the expected input values required.
+{SinOsc.ar(mul:MouseX.kr(minval:0.03, maxval:0.2), add:MouseY.kr(minval:0.9, maxval:-0.9))}.scope;
