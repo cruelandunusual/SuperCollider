@@ -310,3 +310,26 @@ from Nick Collins' SuperCollider tutorials
 
 **********************************/
 
+// Store a reference to a running synth:
+a = {SinOsc.ar(freq:440)*0.2 !2}.scope;
+a.run(false);
+a.run;
+a.free;
+
+// an argument to a function is a way to control a synth parameter
+a = {arg wave = 440, amp = 0.2; SinOsc.ar(wave)*amp !2}.play;
+a.run(false);
+a.set(\wave, 1000);
+a.run;
+
+a.set(\wave, rrand(220,440), \amp, rrand(0.05, 0.2));
+
+
+
+/*********************************
+
+2.4 Modulation Synthesis
+from Nick Collins' SuperCollider tutorials
+[ composerprogrammer.com ]
+
+**********************************/
