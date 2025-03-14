@@ -333,3 +333,34 @@ from Nick Collins' SuperCollider tutorials
 [ composerprogrammer.com ]
 
 **********************************/
+
+// In modulation synthesis one wave, the carrier, is influenced (modulated) by a second, the modulator.
+// Ring modulation - a straight multiplication of two signals
+// carrier * modulator
+(
+{
+	var carrier, modulator, carrierFreq, modulatorFreq;
+	carrierFreq = MouseX.kr(minval:440, maxval:5000, warp:'exponential');
+	modulatorFreq = MouseY.kr(minval:1, maxval:5000, warp:'exponential');
+	carrier = LFSaw.ar(freq:carrierFreq, mul:0.2);
+	modulator = LFSaw.ar(freq:modulatorFreq, mul:0.2);
+	Pan2.ar(in:carrier * modulator, pos:0.0, level:1.0);
+}.scope;
+)
+
+(
+{
+	var freq, freqMult, carrier, modulator, output;
+	freq = 300;
+	freqMult = 4;
+	carrier = SinOsc.ar(freq:freq);
+	modulator = SinOsc.ar(freq:freq * freqMult);
+	output = carrier * modulator;
+	Pan2.ar(in:output, pos:0.0, level:0.2);
+}.scope;
+)
+
+c = 300;
+m = 4;
+n = c*m;
+

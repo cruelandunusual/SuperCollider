@@ -10,7 +10,7 @@ s.options.blockSize;
 {SinOsc.ar(440, phase: pi/4, mul:0.2)}.play;
 
 // LFTri has iphase instead of phase
-{LFTri.ar(440, iphase: 4)}.play;
+{LFTri.ar(440, iphase: 4, mul:0.2)}.play;
 
 // Use this to calibrate hardware volume levels
 {PinkNoise.ar(mul:1) ! 2}.play;
@@ -35,7 +35,7 @@ s.options.blockSize;
 // using set to change the sound (in this case the freq being played
 (
 x = {
-	| freq = 300| // pipe arg format
+	| freq = 300 | // pipe arg format
 	SinOsc.ar(freq, mul:0.1) ! 2;
 }.play;
 )
@@ -46,8 +46,9 @@ x.free();
 // using arg instead of pipe format
 (
 x = {
-	arg freq = 300;
-	SinOsc.ar(freq:freq, mul:0.1).dup(2);
+	arg freq = 440;
+	var freqMult = 0.5;
+	SinOsc.ar(freq:freq * freqMult, mul:0.1).dup(2);
 }.scope;
 )
 
@@ -87,7 +88,6 @@ x.free();
 x = ~myFunc.play;
 
 x.set(\freq, 440);
-f.set(\freq, 300, \amp, 0.2); // doesn't affect the synth object x that's playing - doesn't throw an error either
 x.free();
 
 // Code example 2.7 -- overriding default argument values
@@ -215,12 +215,20 @@ x.release(2);
 (
 x = {
 	var sig, lfo;
-	lfo = SinOsc.kr(freq: 0.2, phase: 3pi/2).curverange(0, 0.2, -1);
+	lfo = SinOsc.kr(freq: 0.2, phase:3pi/2).curverange(0, 0.2, -1);
 	sig = (PinkNoise.ar * lfo) ! 2;
 }.play;
 )
 x.release(2);
 
+(
+x = {
+	var sig, lfo;
+	lfo = (SinOsc.kr(freq:0.2, phase:3pi/2).range(0, 0.2));
+	sig = (SinOsc.ar(freq:220, phase:3pi/2) * lfo) ! 2;
+}.play;
+)
+x.release(2);
 
 /******************************/
 /* Envelopes                  */
@@ -641,3 +649,5 @@ x.do({|n| n.set(\gate, 0, \rel, 5)});
 // PMS trying to work out what's going on in this strange syntax
 x = [100, 234, 399, 434].collect({|j| Synth.new(\test, [\freq, j, \amp, 0.1])});
 List[4857,39485,83475,34].collect({arg n; postln(n)});
+
+
