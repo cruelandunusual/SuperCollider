@@ -170,6 +170,18 @@ together to create more involved sounds
 }.scope;
 )
 
+// two signals differing in frequency by 1Hz
+(
+x = {
+	var freq, signal_1, signal_2, output;
+	freq = 440;
+	signal_1 = SinOsc.ar(freq:freq, mul:0.1);
+	signal_2 = SinOsc.ar(freq:freq+1, mul:0.1);
+	output = signal_1 + signal_2;
+	output !2;
+}.scope;
+)
+
 /*
 
 We are now equipped to explore additive synthesis via sine tones.
@@ -363,4 +375,6 @@ from Nick Collins' SuperCollider tutorials
 c = 300;
 m = 4;
 n = c*m;
+
+
 
